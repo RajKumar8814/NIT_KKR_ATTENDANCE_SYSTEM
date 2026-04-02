@@ -3,17 +3,24 @@ import subprocess
 import sys
 import time
 
-st.title("NIT KKR Attendance System - Server")
-st.write("Flask server is starting...")
+st.set_page_config(page_title="NIT KKR Attendance System", layout="wide")
 
-# Flask app ko background mein chalane ke liye
-if 'process' not in st.session_state:
-    with st.spinner("Starting Flask Backend..."):
+st.title("🚀 NIT KKR Attendance System")
+
+# Flask ko background mein chalane ka logic
+if 'flask_process' not in st.session_state:
+    with st.spinner("Starting Backend Engine..."):
         proc = subprocess.Popen([sys.executable, "app.py"], 
                                stdout=subprocess.PIPE, 
                                stderr=subprocess.STDOUT)
-        st.session_state.process = proc
-        time.sleep(5) # Server ko uthne ka time dein
+        st.session_state.flask_process = proc
+        time.sleep(10) # Server ko fully load hone dein
 
-st.success("Server is Live!")
-st.write("Note: Streamlit might not show the HTML directly. Check the logs for the local URL.")
+# SABSE ZAROORI: Flask app ko Streamlit ke andar dikhana
+st.success("Backend is Active!")
+st.write("Checking connection...")
+
+# Ye line aapke Flask app (port 8501 ya 5000) ko iframe mein load karegi
+st.components.v1.iframe("http://localhost:8501", height=800, scrolling=True)
+
+st.info("Agar upar page load nahi ho raha, toh ye aapke local port par chal raha hai. Deploy link check karein.")
