@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NITKKR Smart Attendance System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+    <!-- Navigation -->
+    <nav class="bg-blue-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="NIT KKR Logo" class="h-8 w-8 mr-3">
+                    <span class="font-bold text-xl tracking-wider">NIT KKR Smart Attendance</span>
+                </div>
+                <div>
+                    {% if session.get('user') %}
+                        <span class="mr-4 text-sm text-blue-200">{{ session.get('user') }} ({{ session.get('role').capitalize() }})</span>
+                        
+                        {% if session.get('role') == 'admin' %}
+                        <a href="{{ url_for('admin.dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Dashboard</a>
+                        <a href="{{ url_for('admin.manage_classes') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Classes</a>
+                        <a href="{{ url_for('admin.manage_teachers') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Teachers</a>
+                        <a href="{{ url_for('admin.manage_students') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Students</a>
+                        
+                        {% elif session.get('role') == 'teacher' %}
+                        <a href="{{ url_for('teacher.dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Dashboard</a>
+                        <a href="{{ url_for('teacher.setup_attendance') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Mark Attendance</a>
+                        <a href="{{ url_for('teacher.reports') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Reports</a>
+                        
+                        {% elif session.get('role') == 'student' %}
+                        <a href="{{ url_for('student.dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Dashboard</a>
+                        <a href="{{ url_for('student.history') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">History</a>
+                        {% endif %}
+
+                        <a href="{{ url_for('auth.logout') }}" class="ml-4 px-3 py-2 rounded-md text-sm font-medium bg-red-600 hover:bg-red-500">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages (Tailwind Toasts) -->
+    <div class="max-w-7xl mx-auto px-4 mt-4 w-full">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="p-4 mb-4 text-sm rounded-lg shadow 
+                        {% if category == 'success' %} bg-green-100 text-green-800 border border-green-200
+                        {% elif category == 'error' %} bg-red-100 text-red-800 border border-red-200
+                        {% else %} bg-blue-100 text-blue-800 border border-blue-200 {% endif %} relative" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500">
+            &copy; 2026 NIT Kurukshetra. Face Recognition Smart Attendance Project.
+        </div>
+    </footer>
+</body>
+</html>

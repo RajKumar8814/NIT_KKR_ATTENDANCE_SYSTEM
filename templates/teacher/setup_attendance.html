@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white rounded-lg shadow border border-gray-100 p-8 mt-4">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Smart Face Attendance</h1>
+    
+    <form method="POST" action="{{ url_for('teacher.setup_attendance') }}" enctype="multipart/form-data">
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Select Class & Subject</label>
+            <select name="subject_data" id="subject_select" required class="w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500">
+                <option value="" disabled selected>Select...</option>
+                {% for sub in teacher.subjects %}
+                <option value="{{ sub.class_id }}|{{ sub.subject_id }}">{{ sub.name }} (Class ID: {{ sub.class_id|truncate(6, True, '') }})</option>
+                {% endfor %}
+            </select>
+            <!-- Hidden inputs extracted via JS -->
+            <input type="hidden" name="class_id" id="hidden_class_id">
+            <input type="hidden" name="subject_id" id="hidden_subject_id">
+        </div>
+        
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+            <input type="date" name="date" id="date" required value="{{ current_date }}" class="w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        
+        <script>
+            document.getElementById('date').valueAsDate = new Date();
+            document.getElementById('subject_select').addEventListener('change', function() {
+                var vals = this.value.split('|');
+                document.getElementById('hidden_class_id').value = vals[0];
+                document.getElementById('hidden_subject_id').value = vals[1];
+            });
+        </script>
+        
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Upload Group Class Photo</label>
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 flex flex-col items-center justify-center cursor-pointer transition" id="drop-area">
+                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <div class="mt-4 flex text-sm text-gray-600">
+                    <label for="group_photo" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                        <span>Upload a file</span>
+                        <input id="group_photo" name="group_photo" type="file" class="sr-only" accept="image/*" required>
+                    </label>
+                    <p class="pl-1">or drag and drop</p>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">PNG, JPG, JPEG up to 16MB</p>
+            </div>
+            <p id="file-name-display" class="mt-2 text-sm text-blue-600 font-medium hidden"></p>
+        </div>
+        
+        <button type="submit" onclick="this.innerHTML='Processing Image... This may take a bit!'; this.classList.add('opacity-75', 'cursor-not-allowed');" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-blue-700 flex justify-center items-center transition">
+            Scan & Identify Faces
+        </button>
+    </form>
+</div>
+
+<script>
+    const fileInput = document.getElementById('group_photo');
+    const display = document.getElementById('file-name-display');
+    fileInput.addEventListener('change', function() {
+        if(this.files && this.files.length > 0) {
+            display.textContent = "Selected: " + this.files[0].name;
+            display.classList.remove('hidden');
+        }
+    });
+</script>
+{% endblock %}

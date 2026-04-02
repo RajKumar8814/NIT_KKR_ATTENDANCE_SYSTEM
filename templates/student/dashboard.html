@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Student Dashboard</h1>
+    <p class="text-gray-600">Welcome, {{ student.name }} ({{ student.roll_no }})</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="col-span-1 md:col-span-4 bg-white rounded-lg shadow-md p-6 border-l-4 
+        {% if overall_percentage >= 75 %} border-green-500 {% else %} border-red-500 {% endif %} flex items-center justify-between">
+        <div>
+            <h2 class="text-lg font-semibold text-gray-700">Overall Attendance</h2>
+            <p class="text-sm text-gray-500 mt-1">Aggregated across all registered subjects</p>
+        </div>
+        <div class="text-right">
+            <span class="text-4xl font-black 
+                {% if overall_percentage >= 75 %} text-green-600 {% else %} text-red-600 {% endif %}">
+                {{ "%.1f"|format(overall_percentage) }}%
+            </span>
+            {% if overall_percentage < 75 %}
+            <p class="text-xs text-red-500 mt-1 font-semibold block">WARNING: Below 75% threshold</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<h2 class="text-xl font-bold text-gray-800 mb-4">Subject-wise Breakdown & 75% Goal Planner</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for stat in stats %}
+    <div class="bg-white rounded-lg shadow-md border border-gray-100 overflow-hidden relative">
+        <div class="p-6">
+            <h3 class="font-bold text-lg text-gray-800 mb-4">{{ stat.subject_name }}</h3>
+            
+            <div class="flex justify-between items-end mb-2">
+                <div>
+                    <span class="text-3xl font-bold text-gray-900">{{ stat.present }}</span>
+                    <span class="text-gray-500">/ {{ stat.total }}</span>
+                    <p class="text-xs text-gray-400 mt-1 mt-1">Classes Attended</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-2xl font-semibold 
+                        {% if stat.percentage >= 75 %} text-green-500 {% else %} text-red-500 {% endif %}">
+                        {{ "%.1f"|format(stat.percentage) }}%
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Progress bar -->
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-200">
+                <div class="h-2.5 rounded-full {% if stat.percentage >= 75 %} bg-green-500 {% elif stat.percentage >= 60 %} bg-yellow-500 {% else %} bg-red-600 {% endif %}" 
+                     style="width: {% if stat.percentage > 100 %}100{% else %}{{ stat.percentage }}{% endif %}%"></div>
+            </div>
+            
+            <!-- 75% Goal Message -->
+            <div class="mt-4 pt-4 border-t border-gray-100">
+                <p class="text-sm font-medium 
+                    {% if stat.percentage >= 75 %} text-green-600
+                    {% else %} text-red-600 {% endif %}">
+                    <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    {{ stat.msg }}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-span-full bg-white p-8 text-center rounded-lg shadow border border-gray-100">
+        <p class="text-gray-500 text-lg">No subjects enrolled yet.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800">Teacher Dashboard</h1>
+        <p class="text-gray-600">Welcome, {{ teacher.name }}</p>
+    </div>
+    <a href="{{ url_for('teacher.setup_attendance') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow">
+        Take Attendance (Face Scan)
+    </a>
+</div>
+
+<h2 class="text-xl font-semibold mb-4 text-gray-800">Your Assigned Subjects</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for ds in subjects %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+        <div class="bg-blue-600 px-4 py-3 text-white">
+            <h3 class="font-bold text-lg">{{ ds.name }}</h3>
+            <p class="text-blue-100 text-sm">{{ ds.class_name }}</p>
+        </div>
+        <div class="p-4">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-gray-600 font-medium text-sm">Total Lectures Recorded:</span>
+                <span class="text-2xl font-bold text-gray-800">{{ ds.total_lectures }}</span>
+            </div>
+            
+            <hr class="mb-4">
+            <div class="flex space-x-2">
+                <form method="POST" action="{{ url_for('teacher.update_lectures', class_id=ds.class_id, subject_id=ds.subject_id) }}" class="flex-1">
+                    <input type="hidden" name="action" value="add">
+                    <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white text-xs font-semibold py-2 px-2 rounded" title="Add an extra class lecture without attendance">
+                        + Extra Class
+                    </button>
+                </form>
+                <form method="POST" action="{{ url_for('teacher.update_lectures', class_id=ds.class_id, subject_id=ds.subject_id) }}" class="flex-1"
+                      onsubmit="return confirm('Reduce total lecture count by 1?');">
+                    <input type="hidden" name="action" value="cancel">
+                    <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-2 px-2 rounded" title="Reduce the total classes count">
+                        - Canceled Class
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-span-full bg-white p-8 text-center rounded-lg shadow border border-gray-100">
+        <p class="text-gray-500 text-lg">No subjects assigned yet.</p>
+        <p class="text-sm text-gray-400 mt-2">Contact Admin to assign classes.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
