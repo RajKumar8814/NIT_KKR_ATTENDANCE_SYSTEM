@@ -2,8 +2,8 @@ Flask
 Flask-PyMongo
 gunicorn
 opencv-python-headless
-face_recognition
 Pillow
 python-dotenv
 pymongo
 numpy
+face_recognition
