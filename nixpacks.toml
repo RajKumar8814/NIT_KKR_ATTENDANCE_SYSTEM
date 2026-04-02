@@ -1,6 +1,9 @@
+[variables]
+    PYTHON_VERSION = "3.10"
+
 [phases.setup]
-nixPkgs = ["...", "cmake", "libglvnd", "gcc", "stdenv.cc.cc.lib", "xorg.libX11"]
+    nixPkgs = ["...", "cmake", "libglvnd", "gcc", "stdenv.cc.cc.lib", "xorg.libX11", "python310"]
 
 [phases.build]
-dependsOn = ["setup"]
-cmds = ["pip install -r requirements.txt"]
+    dependsOn = ["setup"]
+    cmds = ["pip install --upgrade pip", "pip install -r requirements.txt"]
