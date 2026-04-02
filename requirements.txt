@@ -1,9 +1,8 @@
-streamlit
 Flask
 Flask-PyMongo
-opencv-python-headless==4.8.0.74
-Pillow
+opencv-python-headless
+face_recognition
+numpy
 python-dotenv
 pymongo
-numpy
-face_recognition
+gunicorn
