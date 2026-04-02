@@ -1,6 +1,6 @@
+streamlit
 Flask
 Flask-PyMongo
-gunicorn
 opencv-python-headless
 Pillow
 python-dotenv
