@@ -1,10 +1,11 @@
 [variables]
-    NIXPACKS_PYTHON_VERSION = "3.10"
+    PYTHON_VERSION = "3.10"
 
 [phases.setup]
     nixPkgs = ["cmake", "libglvnd", "gcc", "stdenv.cc.cc.lib", "xorg.libX11", "python310"]
 
-[phases.install]
+[phases.build]
+    dependsOn = ["setup"]
     cmds = ["python -m venv /app/.venv", "/app/.venv/bin/pip install --upgrade pip", "/app/.venv/bin/pip install -r requirements.txt"]
 
 [start]
