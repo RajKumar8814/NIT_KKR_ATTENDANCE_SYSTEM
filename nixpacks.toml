@@ -1,16 +1,15 @@
 [variables]
     NIXPACKS_PYTHON_VERSION = "3.10"
-    PYTHONPATH = "/app/.venv/lib/python3.10/site-packages:$PYTHONPATH"
-    PATH = "/app/.venv/bin:$PATH"
 
 [phases.setup]
     nixPkgs = ["cmake", "libglvnd", "gcc", "stdenv.cc.cc.lib", "xorg.libX11", "python310"]
 
 [phases.install]
+    # Yahan hum --no-cache-dir use karenge taaki memory bache
     cmds = [
         "python -m venv /app/.venv",
         "/app/.venv/bin/pip install --upgrade pip",
-        "/app/.venv/bin/pip install -r requirements.txt"
+        "/app/.venv/bin/pip install --no-cache-dir -r requirements.txt"
     ]
 
 [start]
