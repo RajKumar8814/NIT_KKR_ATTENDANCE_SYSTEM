@@ -2,9 +2,9 @@
     NIXPACKS_PYTHON_VERSION = "3.10"
 
 [phases.setup]
-    # Providing Ubuntu APT packages perfectly mirrors Railway's base Debian/Ubuntu builder environment
-    # Crucial for deep-C++ compilations like dlib wrapper for face_recognition
-    aptPkgs = ["cmake", "build-essential", "libboost-all-dev", "libgl1-mesa-glx", "python3-dev"]
+    # Reverting to nixPkgs because apt-get is failing on Ubuntu Noble missing 'libgl1-mesa-glx'
+    # We only need cmake and a c compiler for dlib since we use opencv-python-headless
+    nixPkgs = ["cmake", "gcc"]
 
 [phases.install]
     # Install dependencies strategically: Upgrade PIP, compile Cmake, compile Dlib, then execute bulk requirements
