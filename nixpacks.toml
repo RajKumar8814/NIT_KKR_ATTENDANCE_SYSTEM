@@ -1,11 +1,15 @@
 [variables]
     NIXPACKS_PYTHON_VERSION = "3.10"
+    # Isse system ko pata chalega ki packages .venv ke andar hain
+    PYTHONPATH = "/app/.venv/lib/python3.10/site-packages:$PYTHONPATH"
+    PATH = "/app/.venv/bin:$PATH"
 
 [phases.setup]
     nixPkgs = ["cmake", "libglvnd", "gcc", "stdenv.cc.cc.lib", "xorg.libX11", "python310"]
 
 [phases.install]
-    cmds = ["python -m venv /app/.venv", "/app/.venv/bin/pip install --upgrade pip", "/app/.venv/bin/pip install -r requirements.txt"]
+    cmds = ["python -m venv /app/.venv","/app/.venv/bin/pip install --upgrade pip","/app/.venv/bin/pip install -r requirements.txt"]
 
 [start]
+    # Direct path call taaki "command not found" ka chance hi na rahe
     cmd = "/app/.venv/bin/gunicorn --bind 0.0.0.0:$PORT app:app"
