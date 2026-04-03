@@ -5,12 +5,9 @@
     nixPkgs = ["cmake", "libglvnd", "gcc", "stdenv.cc.cc.lib", "xorg.libX11", "python310"]
 
 [phases.install]
-    # Yahan hum --no-cache-dir use karenge taaki memory bache
-    cmds = [
-        "python -m venv /app/.venv",
-        "/app/.venv/bin/pip install --upgrade pip",
-        "/app/.venv/bin/pip install --no-cache-dir -r requirements.txt"
-    ]
+    # Virtual environment ke bina seedha install
+    cmds = ["pip install --upgrade pip", "pip install -r requirements.txt"]
 
 [start]
-    cmd = "/app/.venv/bin/gunicorn --bind 0.0.0.0:$PORT app:app"
+    # Seedha gunicorn call, koi path ka jhanjhat nahi
+    cmd = "gunicorn --bind 0.0.0.0:$PORT app:app"
