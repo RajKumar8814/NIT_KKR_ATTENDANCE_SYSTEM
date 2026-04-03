@@ -33,7 +33,7 @@ def send_otp_email(user_email, otp):
         
     if not mail_user or not mail_pass:
         print(f"========== DEBUG OTP: {otp} for {user_email} ==========")
-        return True
+        return True, "MAIL_PASS not configured"
 
     try:
         msg = MIMEMultipart()
@@ -44,17 +44,16 @@ def send_otp_email(user_email, otp):
         body = f"Your one-time password (OTP) is: {otp}\nIt is valid for 5 minutes."
         msg.attach(MIMEText(body, 'plain'))
 
-        # Use strict SSL on port 465 directly. STARTTLS on 587 often fails on container deployments
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=15)
         server.login(mail_user, mail_pass)
         server.send_message(msg)
         server.quit()
-        return True
+        return True, "Success"
     except Exception as e:
         print(f"Failed to send email: {e}")
         # Even if sending fails, print it out so debugging is easy
         print(f"========== DEBUG OTP (Send Failed): {otp} for {user_email} ==========")
-        return False
+        return False, str(e)
 
 # Decorators
 def login_required(f):
