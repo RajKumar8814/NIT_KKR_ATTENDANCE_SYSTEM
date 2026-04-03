@@ -5,9 +5,12 @@
     nixPkgs = ["cmake", "libglvnd", "gcc", "stdenv.cc.cc.lib", "xorg.libX11", "python310"]
 
 [phases.install]
-    # Virtual environment ke bina seedha install
-    cmds = ["pip install --upgrade pip", "pip install -r requirements.txt"]
+    # Global environment mein module call se install karenge
+    cmds = [
+        "python3 -m pip install --upgrade pip",
+        "python3 -m pip install -r requirements.txt"
+    ]
 
 [start]
-    # Seedha gunicorn call, koi path ka jhanjhat nahi
-    cmd = "gunicorn --bind 0.0.0.0:$PORT app:app"
+    # Gunicorn ko module ki tarah run karenge taaki path ka issue hi na rahe
+    cmd = "python3 -m gunicorn --bind 0.0.0.0:$PORT app:app"
