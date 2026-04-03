@@ -35,4 +35,4 @@ ENV PORT=5000
 EXPOSE $PORT
 
 # Run Gunicorn with extreme memory profiling matching the 512MB RAM free tier limit
-CMD ["sh", "-c", "gunicorn --workers 1 --threads 2 --bind 0.0.0.0:$PORT app:app"]
+CMD ["sh", "-c", "gunicorn --workers 1 --threads 2 --timeout 180 --bind 0.0.0.0:$PORT app:app"]
