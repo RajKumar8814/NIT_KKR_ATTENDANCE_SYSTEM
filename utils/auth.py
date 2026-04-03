@@ -27,6 +27,10 @@ def send_otp_email(user_email, otp):
     mail_user = os.getenv("MAIL_USER")
     mail_pass = os.getenv("MAIL_PASS")
 
+    # Deep clean formatting incase the App Password was copied with whitespace spaces
+    if mail_pass:
+        mail_pass = mail_pass.replace(" ", "").strip()
+        
     if not mail_user or not mail_pass:
         print(f"========== DEBUG OTP: {otp} for {user_email} ==========")
         return True
