@@ -62,25 +62,59 @@ def add_subject(class_id):
     subject_name = request.form.get("subject_name").strip()
     teacher_email = request.form.get("teacher_email", "").strip()
     
-    subject_id = str(uuid.uuid4())
-    subject = {
-        "subject_id": subject_id,
-        "name": subject_name,
-        "teacher_email": teacher_email,
-        "total_lectures": 0
-    }
-    
-    # Add subject to class
-    db.classes.update_one({"_id": class_id}, {"$push": {"subjects": subject}})
-    
-    # Assign to teacher if provided
-    if teacher_email:
-        db.teachers.update_one(
-            {"email": teacher_email}, 
-            {"$push": {"subjects": {"class_id": class_id, "subject_id": subject_id, "name": subject_name}}}
+    cls = db.classes.find_one({"_id": class_id})
+    if not cls:
+        return redirect(url_for("admin.manage_classes"))
+
+    existing_subj = None
+    for subj in cls.get("subjects", []):
+        if subj.get("name").lower() == subject_name.lower():
+            existing_subj = subj
+            break
+
+    if existing_subj:
+        # UPSERT LOGIC
+        subject_id = existing_subj.get("subject_id")
+        old_teacher = existing_subj.get("teacher_email")
+        
+        if old_teacher and old_teacher != teacher_email:
+            db.teachers.update_one(
+                {"email": old_teacher},
+                {"$pull": {"subjects": {"class_id": class_id, "subject_id": subject_id}}}
+            )
+            
+        if teacher_email and old_teacher != teacher_email:
+            db.teachers.update_one(
+                {"email": teacher_email},
+                {"$push": {"subjects": {"class_id": class_id, "subject_id": subject_id, "name": existing_subj.get("name")}}}
+            )
+            
+        db.classes.update_one(
+            {"_id": class_id, "subjects.subject_id": subject_id},
+            {"$set": {"subjects.$.teacher_email": teacher_email}}
         )
-    
-    flash("Subject added successfully", "success")
+        flash(f"Subject '{subject_name}' configuration updated.", "success")
+        
+    else:
+        # INSERT LOGIC
+        subject_id = str(uuid.uuid4())
+        subject = {
+            "subject_id": subject_id,
+            "name": subject_name,
+            "teacher_email": teacher_email,
+            "total_lectures": 0
+        }
+        
+        db.classes.update_one({"_id": class_id}, {"$push": {"subjects": subject}})
+        
+        if teacher_email:
+            db.teachers.update_one(
+                {"email": teacher_email}, 
+                {"$push": {"subjects": {"class_id": class_id, "subject_id": subject_id, "name": subject_name}}}
+            )
+        
+        flash("Subject added successfully", "success")
+        
     return redirect(url_for("admin.manage_classes"))
 
 @admin_bp.route("/classes/<class_id>/subjects/<subject_id>/remove_teacher", methods=["POST"])
@@ -112,6 +146,31 @@ def remove_teacher_from_subject(class_id, subject_id):
     )
     
     flash("Teacher unassigned successfully", "success")
+    return redirect(url_for("admin.manage_classes"))
+
+@admin_bp.route("/classes/<class_id>/subjects/<subject_id>/delete", methods=["POST"])
+def delete_subject_from_class(class_id, subject_id):
+    db = get_db()
+    
+    cls = db.classes.find_one({"_id": class_id})
+    if not cls: return redirect(url_for("admin.manage_classes"))
+        
+    for subj in cls.get("subjects", []):
+        if subj.get("subject_id") == subject_id:
+            teacher_email = subj.get("teacher_email")
+            if teacher_email:
+                db.teachers.update_one(
+                    {"email": teacher_email},
+                    {"$pull": {"subjects": {"subject_id": subject_id, "class_id": class_id}}}
+                )
+            break
+            
+    db.classes.update_one(
+        {"_id": class_id},
+        {"$pull": {"subjects": {"subject_id": subject_id}}}
+    )
+    
+    flash("Subject permanently removed from class schedule.", "success")
     return redirect(url_for("admin.manage_classes"))
 
 # --- Student Management ---
