@@ -24,8 +24,10 @@ def login():
         session["pending_otp"] = otp
         session["pending_role"] = role
 
-        send_otp_email(email, otp)
-        flash("OTP sent to your email (check console if MAIL_PASS is unset).", "info")
+        if send_otp_email(email, otp):
+            flash("OTP sent to your email successfully.", "info")
+        else:
+            flash("Failed to send OTP via Email. Please check server logs.", "error")
         return redirect(url_for("auth.verify_otp"))
 
     return render_template("login.html")

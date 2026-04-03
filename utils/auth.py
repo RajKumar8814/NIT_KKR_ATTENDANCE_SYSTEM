@@ -44,10 +44,8 @@ def send_otp_email(user_email, otp):
         body = f"Your one-time password (OTP) is: {otp}\nIt is valid for 5 minutes."
         msg.attach(MIMEText(body, 'plain'))
 
-        # Railway environments can sometimes hang on strict outbound SMTP limits
-        # Setting a 10-second timeout completely prevents the Gunicorn worker from crashing (Internal Server Error)
-        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=10)
-        server.starttls()
+        # Use strict SSL on port 465 directly. STARTTLS on 587 often fails on container deployments
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=15)
         server.login(mail_user, mail_pass)
         server.send_message(msg)
         server.quit()
