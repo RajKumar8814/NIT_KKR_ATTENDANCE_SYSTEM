@@ -2,15 +2,19 @@
     NIXPACKS_PYTHON_VERSION = "3.10"
 
 [phases.setup]
-    nixPkgs = ["cmake", "libglvnd", "gcc", "stdenv.cc.cc.lib", "xorg.libX11", "python310"]
+    # Providing Ubuntu APT packages perfectly mirrors Railway's base Debian/Ubuntu builder environment
+    # Crucial for deep-C++ compilations like dlib wrapper for face_recognition
+    aptPkgs = ["cmake", "build-essential", "libboost-all-dev", "libgl1-mesa-glx", "python3-dev"]
 
 [phases.install]
-    # Global environment mein module call se install karenge
+    # Install dependencies strategically: Upgrade PIP, compile Cmake, compile Dlib, then execute bulk requirements
     cmds = [
-        "python3 -m pip install --upgrade pip",
-        "python3 -m pip install -r requirements.txt"
+        "python -m pip install --upgrade pip",
+        "python -m pip install cmake",
+        "python -m pip install dlib --prefer-binary",
+        "python -m pip install -r requirements.txt"
     ]
 
 [start]
-    # Gunicorn ko module ki tarah run karenge taaki path ka issue hi na rahe
-    cmd = "python3 -m gunicorn --bind 0.0.0.0:$PORT app:app"
+    # Gunicorn bound to dynamic Railway port
+    cmd = "python -m gunicorn --workers 1 --threads 2 --bind 0.0.0.0:$PORT app:app"
