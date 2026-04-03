@@ -46,6 +46,14 @@ def create_app():
                 return redirect(url_for("student.dashboard"))
         return redirect(url_for("auth.login"))
 
+    # Global Error Handler: Injects backend crash tracebacks instantly to the browser for debugging
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        import traceback
+        error_trace = traceback.format_exc()
+        # Cleanly return the trace to the user UI safely bypassing normal internal 500 HTML
+        return f"<h1>Traceback Captured</h1><pre style='background:#f8f8f8;padding:20px;border:1px solid #ddd;overflow-x:auto;'>{error_trace}</pre>", 500
+
     # Cleanup memory after initialization
     gc.collect()
     
