@@ -60,7 +60,7 @@ def manage_classes():
 def add_subject(class_id):
     db = get_db()
     subject_name = request.form.get("subject_name").strip()
-    teacher_email = request.form.get("teacher_email").strip()
+    teacher_email = request.form.get("teacher_email", "").strip()
     
     subject_id = str(uuid.uuid4())
     subject = {
@@ -73,13 +73,45 @@ def add_subject(class_id):
     # Add subject to class
     db.classes.update_one({"_id": class_id}, {"$push": {"subjects": subject}})
     
-    # Assign to teacher
-    db.teachers.update_one(
-        {"email": teacher_email}, 
-        {"$push": {"subjects": {"class_id": class_id, "subject_id": subject_id, "name": subject_name}}}
+    # Assign to teacher if provided
+    if teacher_email:
+        db.teachers.update_one(
+            {"email": teacher_email}, 
+            {"$push": {"subjects": {"class_id": class_id, "subject_id": subject_id, "name": subject_name}}}
+        )
+    
+    flash("Subject added successfully", "success")
+    return redirect(url_for("admin.manage_classes"))
+
+@admin_bp.route("/classes/<class_id>/subjects/<subject_id>/remove_teacher", methods=["POST"])
+def remove_teacher_from_subject(class_id, subject_id):
+    db = get_db()
+    
+    # Find the class and the subject to know which teacher to remove it from
+    cls = db.classes.find_one({"_id": class_id})
+    if not cls: 
+        return redirect(url_for("admin.manage_classes"))
+    
+    target_teacher = None
+    for subj in cls.get("subjects", []):
+        if subj.get("subject_id") == subject_id:
+            target_teacher = subj.get("teacher_email")
+            break
+            
+    if target_teacher:
+        # Remove from teacher's array
+        db.teachers.update_one(
+            {"email": target_teacher},
+            {"$pull": {"subjects": {"class_id": class_id, "subject_id": subject_id}}}
+        )
+        
+    # Update the class subject to unassigned (empty string)
+    db.classes.update_one(
+        {"_id": class_id, "subjects.subject_id": subject_id},
+        {"$set": {"subjects.$.teacher_email": ""}}
     )
     
-    flash("Subject added and assigned to teacher", "success")
+    flash("Teacher unassigned successfully", "success")
     return redirect(url_for("admin.manage_classes"))
 
 # --- Student Management ---
