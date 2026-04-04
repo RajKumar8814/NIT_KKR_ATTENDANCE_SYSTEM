@@ -50,9 +50,9 @@ def send_otp_email(user_email, otp):
         body = f"Your one-time password (OTP) is: {otp}\nIt is valid for 5 minutes."
         msg.attach(MIMEText(body, 'plain'))
 
-        # Modern Gmail SMTP Port 587 with STARTTLS (Very stable for Railway/Cloud)
-        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=20)
-        server.starttls()
+        # Modern Gmail SMTP Port 465 with SSL (Extremely stable for Railway/Cloud)
+        # Port 465 is often left open when 587 is restricted
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=25)
         server.login(mail_user, mail_pass)
         server.send_message(msg)
         server.quit()
