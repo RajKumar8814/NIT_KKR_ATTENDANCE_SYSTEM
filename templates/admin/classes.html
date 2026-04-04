@@ -1,48 +1,50 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="py-12 animate-fade">
-    <div class="flex items-end justify-between mb-16 gap-4">
+    <div class="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
         <div>
-            <h1 class="text-6xl font-bold tracking-tighter text-white mb-2">Academic Layout</h1>
-            <p class="text-gray-400 font-medium font-inter">Manage classes, subjects, and faculty session goals.</p>
+            <h1 class="text-6xl font-black tracking-tighter text-slate-800 mb-2">Academic Roadmap</h1>
+            <p class="text-slate-500 font-extrabold uppercase tracking-widest text-[10px]">Manage institution course groups, subject mappings, and faculty goals.</p>
         </div>
-        <button onclick="document.getElementById('class-modal').classList.toggle('hidden')" class="btn-premium">Create Class</button>
+        <button onclick="document.getElementById('class-modal').classList.toggle('hidden')" class="btn-premium px-10 h-16 flex items-center justify-center uppercase tracking-widest text-[10px] font-black">Initialize New Course +</button>
     </div>
 
     <!-- Classes Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
         {% for cls in classes %}
-        <div class="premium-card p-0 overflow-hidden flex flex-col border-none bg-gradient-to-br from-white/5 to-transparent relative group">
+        <div class="premium-card p-0 overflow-hidden flex flex-col border-pink-50 shadow-xl relative group">
             <!-- Remove Class Button (Top Right) -->
             <form action="{{ url_for('admin.delete_class', class_id=cls._id) }}" method="POST" 
-                  onsubmit="return confirm('Remove entire class and all students?')" 
+                  onsubmit="return confirm('WARNING: You are about to permanently remove an entire course group and all student associations. Continue?')" 
                   class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                <button type="submit" class="p-2 bg-rose-500/20 text-rose-500 rounded-lg hover:bg-rose-500 hover:text-white transition-all">
+                <button type="submit" class="p-3 bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                 </button>
             </form>
 
-            <div class="p-10 border-b border-white/5 bg-white/5">
-                <h3 class="text-3xl font-bold text-white mb-2">{{ cls.name }}</h3>
-                <code class="text-[10px] font-black text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded uppercase tracking-widest">ID: {{ cls._id[:8] }}...</code>
+            <div class="p-10 border-b border-slate-50 bg-slate-50/50">
+                <h3 class="text-3xl font-black text-slate-800 mb-2">{{ cls.name }}</h3>
+                <code class="text-[10px] font-black text-pink-500 bg-pink-50 px-2 py-1 rounded-lg uppercase tracking-widest border border-pink-100/50">ID: {{ (cls._id|string)[:8] }}...</code>
             </div>
             
             <div class="p-10 flex-grow">
-                <p class="text-xs font-black text-gray-500 uppercase tracking-widest mb-8 border-b border-white/5 pb-2">Active Subjects</p>
-                <div class="space-y-6">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 border-b border-slate-50 pb-2">Institutional Subject Load</p>
+                <div class="space-y-8">
                     {% if cls.subjects %}
                         {% for sub in cls.subjects %}
                         <div class="flex items-center justify-between group/sub">
                             <div class="flex-grow">
-                                <p class="text-lg font-bold text-white leading-tight">{{ sub.name }}</p>
-                                <p class="text-xs font-bold text-gray-500 mt-1 uppercase tracking-tighter">{% if sub.teacher_email %}{{ sub.teacher_email }}{% else %}<span class="text-rose-500">Unassigned</span>{% endif %}</p>
+                                <p class="text-lg font-black text-slate-800 leading-tight group-hover/sub:text-pink-500 transition-colors">{{ sub.name }}</p>
+                                <p class="text-[10px] font-black text-slate-400 mt-1 uppercase tracking-widest">
+                                    {% if sub.teacher_email %}{{ sub.teacher_email }}{% else %}<span class="text-rose-500 italic">Faculty Missing</span>{% endif %}
+                                </p>
                             </div>
-                            <div class="flex items-center gap-4">
-                                <p class="text-xl font-black text-indigo-400">{{ sub.total_lectures }}<span class="text-[10px] text-gray-600 ml-1">/ 34</span></p>
+                            <div class="flex items-center gap-6">
+                                <p class="text-2xl font-black text-pink-500">{{ sub.total_lectures }}<span class="text-[10px] text-slate-300 ml-1">/ 34</span></p>
                                 
                                 <form action="{{ url_for('admin.delete_subject', class_id=cls._id, subject_id=sub.subject_id) }}" method="POST" 
-                                      onsubmit="return confirm('Remove subject?')" class="opacity-0 group-hover/sub:opacity-100 transition-opacity">
-                                    <button type="submit" class="text-rose-500 hover:text-rose-400 p-1">
+                                      onsubmit="return confirm('Remove institutional subject mapping?')" class="opacity-0 group-hover/sub:opacity-100 transition-opacity">
+                                    <button type="submit" class="text-rose-400 hover:text-rose-600 p-1">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                     </button>
                                 </form>
@@ -50,22 +52,27 @@
                         </div>
                         {% endfor %}
                     {% else %}
-                        <p class="text-xs font-bold text-gray-600 uppercase tracking-widest text-center py-4">No subjects registered</p>
+                        <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest text-center py-8 italic">No curriculum mapped to this group</p>
                     {% endif %}
                 </div>
             </div>
 
-            <div class="p-10 pt-0 bg-white/2">
+            <div class="p-10 pt-0 bg-slate-50/20">
                 <form action="{{ url_for('admin.add_subject', class_id=cls._id) }}" method="POST" class="space-y-4">
-                    <input type="text" name="subject_name" placeholder="Subject Name (e.g. AI-902)" class="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
-                    <select name="teacher_email" class="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none">
-                        <option value="">-- Faculty Mapping --</option>
-                        <option value="">Unassigned</option>
-                        {% for teacher in teachers %}
-                        <option value="{{ teacher.email }}">{{ teacher.name }}</option>
-                        {% endfor %}
-                    </select>
-                    <button type="submit" class="w-full btn-premium h-12 text-sm">Link Subject</button>
+                    <input type="text" name="subject_name" placeholder="Subject Handle (e.g. CS-901)" class="w-full h-12 bg-white border border-slate-200 rounded-xl px-4 text-slate-800 text-sm focus:outline-none focus:ring-4 focus:ring-pink-500/10 transition-all placeholder:text-slate-300" required>
+                    <div class="relative">
+                        <select name="teacher_email" class="w-full h-12 bg-white border border-slate-200 rounded-xl px-4 text-slate-800 text-sm focus:outline-none focus:ring-4 focus:ring-pink-500/10 appearance-none cursor-pointer">
+                            <option value="">-- Assign Faculty Link --</option>
+                            <option value="">Unassigned</option>
+                            {% for teacher in teachers %}
+                            <option value="{{ teacher.email }}">{{ teacher.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full btn-premium h-12 text-[10px] font-black uppercase tracking-widest">Seal Subject Mapping</button>
                 </form>
             </div>
         </div>
@@ -73,18 +80,18 @@
     </div>
 
     <!-- Modal for Class Creation -->
-    <div id="class-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-xl z-50 flex items-center justify-center p-6">
-        <div class="premium-card w-full max-w-md animate-fade">
-            <h2 class="text-4xl font-bold mb-2">Create Class</h2>
-            <p class="text-gray-500 font-medium mb-12">Academic classes act as containers for subjects and students.</p>
-            <form action="{{ url_for('admin.manage_classes') }}" method="POST" class="space-y-6">
+    <div id="class-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-3xl z-[2000] flex items-center justify-center p-6">
+        <div class="premium-card w-full max-w-md animate-fade border-pink-100 shadow-2xl">
+            <h2 class="text-4xl font-black mb-2 text-slate-800 tracking-tighter">Academic Initialization</h2>
+            <p class="text-slate-400 font-extrabold mb-12 text-[10px] uppercase tracking-widest">Define new course boundaries for semester tracking.</p>
+            <form action="{{ url_for('admin.manage_classes') }}" method="POST" class="space-y-8">
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Class Name</label>
-                    <input type="text" name="class_name" placeholder="e.g. B.Tech CS-A" class="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 ml-1">Official Class Name</label>
+                    <input type="text" name="class_name" placeholder="e.g. B.Tech IT-B" class="w-full h-16 bg-slate-50 border border-slate-200 rounded-2xl px-6 text-slate-800 text-lg focus:outline-none focus:ring-4 focus:ring-pink-500/10 transition-all placeholder:text-slate-300" required>
                 </div>
-                <div class="flex gap-4 pt-4">
-                    <button type="button" onclick="document.getElementById('class-modal').classList.add('hidden')" class="flex-1 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Cancel</button>
-                    <button type="submit" class="btn-premium flex-1 h-14">Create Class Mapping</button>
+                <div class="flex gap-4 pt-8 border-t border-slate-100 mt-4">
+                    <button type="button" onclick="document.getElementById('class-modal').classList.add('hidden')" class="flex-1 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] hover:text-rose-500 transition-colors">Discard</button>
+                    <button type="submit" class="btn-premium flex-1 h-16 shadow-pink-100 text-[10px] font-black uppercase tracking-widest">Create Academic Map</button>
                 </div>
             </form>
         </div>

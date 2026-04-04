@@ -3,41 +3,41 @@
 <div class="py-12 animate-fade">
     <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
         <div>
-            <h1 class="text-6xl font-bold tracking-tighter text-white mb-2">My History</h1>
-            <p class="text-gray-400 font-medium font-inter uppercase tracking-widest text-[10px]">Session-by-session activity log for <span class="text-indigo-400 font-black">{{ student.name }}</span> | NIT Kurukshetra</p>
+            <h1 class="text-6xl font-black tracking-tighter text-slate-800 mb-2">Academic Audit</h1>
+            <p class="text-slate-500 font-extrabold uppercase tracking-widest text-[10px]">Session-by-session history for Learner: <span class="text-pink-500 font-extrabold">{{ student.name }}</span> | NIT KKR Academic Status</p>
         </div>
     </div>
 
     <!-- Attendance Table -->
-    <div class="premium-card p-0 overflow-hidden overflow-x-auto border-none bg-transparent">
+    <div class="premium-card p-0 overflow-hidden overflow-x-auto border-pink-100 shadow-2xl">
         <table class="premium-table">
-            <thead>
+            <thead class="bg-slate-50">
                 <tr>
-                    <th class="w-1/4">Session Date</th>
-                    <th class="w-1/4">Subject Name</th>
-                    <th class="w-1/4">Faculty</th>
-                    <th class="w-1/4">Status</th>
+                    <th class="w-1/4 text-slate-400">Date of Session</th>
+                    <th class="w-1/4 text-slate-400">Institutional Subject</th>
+                    <th class="w-1/4 text-slate-400">Authorized Faculty</th>
+                    <th class="w-1/4 text-slate-400">Status Verification</th>
                 </tr>
             </thead>
             <tbody>
                 {% if history %}
                     {% for h in history %}
-                    <tr class="group">
-                        <td><p class="font-bold text-white leading-tight uppercase tracking-widest text-xs">{{ h.date }}</p></td>
-                        <td><p class="font-black text-indigo-400 leading-tight uppercase tracking-widest text-xs">{{ h.subject_name }}</p></td>
-                        <td><p class="font-bold text-gray-500 leading-tight uppercase tracking-widest text-xs">{{ h.teacher_name }}</p></td>
+                    <tr class="group hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0">
+                        <td><p class="font-black text-slate-800 leading-tight uppercase tracking-widest text-[10px]">{{ h.date }}</p></td>
+                        <td><p class="font-black text-pink-500 leading-tight uppercase tracking-widest text-xs">{{ h.subject_name }}</p></td>
+                        <td><p class="font-bold text-slate-400 leading-tight uppercase tracking-widest text-[10px]">{{ h.teacher_name or "Official Registry" }}</p></td>
                         <td>
                             {% if h.status == 'Present' %}
-                                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-400 uppercase tracking-widest">Marked Present</span>
+                                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 uppercase tracking-[0.1em]">Verified Attendance ✅</span>
                             {% else %}
-                                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black bg-rose-500/10 text-rose-400 uppercase tracking-widest">Marked Absent</span>
+                                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black bg-rose-50 text-rose-500 uppercase tracking-[0.1em]">Class Missed ⚠️</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="4" class="py-32 text-center text-xs font-black text-gray-600 uppercase tracking-widest animate-pulse">No academic sessions found in your history log</td>
+                        <td colspan="4" class="py-32 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse italic">No academic sessions discovered in your institutional history log</td>
                     </tr>
                 {% endif %}
             </tbody>

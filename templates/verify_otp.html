@@ -1,25 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="max-w-md mx-auto py-32 animate-fade">
-    <div class="premium-card p-12 text-center">
-        <div class="h-16 w-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-8">
-            <svg class="h-8 w-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+    <div class="premium-card p-12 text-center border-pink-100 shadow-2xl">
+        <div class="h-16 w-16 bg-pink-500/10 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-inner">
+            <svg class="h-8 w-8 text-pink-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
         </div>
         
-        <h1 class="text-4xl font-bold mb-2">Check Email</h1>
-        <p class="text-gray-400 font-medium mb-10">We've sent a 6-digit code to your inbox.</p>
+        <h1 class="text-4xl font-black mb-2 text-slate-800 tracking-tighter">Enter Code</h1>
+        <p class="text-slate-500 font-extrabold uppercase tracking-widest text-[10px] mb-12">Institutional 6-Digit OTP sent to your NIT KKR inbox.</p>
         
-        <form method="POST" action="{{ url_for('auth.verify_otp') }}" class="space-y-6">
-            <input class="w-full text-center h-20 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-5xl font-black tracking-[0.4em] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono placeholder:text-gray-800" 
+        <form method="POST" action="{{ url_for('auth.verify_otp') }}" class="space-y-12">
+            <input class="w-full text-center h-24 bg-slate-50 border border-slate-200 rounded-3xl px-6 text-slate-800 text-6xl font-black tracking-[0.3em] focus:outline-none focus:ring-4 focus:ring-pink-500/10 transition-all font-mono placeholder:text-slate-200" 
                    id="otp" type="text" name="otp" placeholder="000000" maxlength="6" required autofocus>
 
-            <button class="btn-premium w-full h-14" type="submit">
-                Securely Verify OTP
+            <button class="btn-premium w-full h-16 uppercase tracking-[0.5em] font-black text-xs shadow-pink-100" type="submit">
+                Finalize Verification →
             </button>
         </form>
 
-        <div class="mt-8 text-center pt-8 border-t border-white/5">
-            <a href="{{ url_for('auth.login') }}" class="text-xs font-bold text-gray-500 uppercase tracking-widest hover:text-indigo-400 transition-colors">Resend Code</a>
+        <div class="mt-12 text-center pt-8 border-t border-slate-100">
+            <a href="{{ url_for('auth.login') }}" class="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-pink-500 transition-colors">Request New Credentials</a>
         </div>
     </div>
 </div>

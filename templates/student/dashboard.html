@@ -1,47 +1,47 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="py-12 animate-fade">
-    <div class="mb-16 bg-gradient-to-br from-indigo-500/10 to-transparent p-12 rounded-[48px] border border-white/5 flex flex-col md:flex-row justify-between items-center text-center md:text-left shadow-2xl">
+    <div class="mb-16 bg-pink-50 p-12 rounded-[48px] border border-pink-100 flex flex-col md:flex-row justify-between items-center text-center md:text-left shadow-xl">
         <div class="mb-8 md:mb-0">
-            <h1 class="text-6xl font-extrabold text-white tracking-widest mb-4">Student <br> Portal</h1>
-            <p class="text-xs font-black text-gray-500 uppercase tracking-widest">Enrollment Profile: <span class="text-indigo-400 font-black">{{ student.name }}</span> | NIT KKR Academic Status</p>
+            <h1 class="text-6xl font-black text-slate-800 tracking-tighter mb-4 leading-none">Academic <br> Record</h1>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Official Profile: <span class="text-pink-500 font-extrabold">{{ student.name }}</span> | NIT KKR Academic Status</p>
         </div>
         <div class="flex items-center gap-12">
             <div class="text-right">
-                <p class="text-xs font-black text-gray-500 uppercase tracking-[0.2em] mb-2 leading-none">Global Progress</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 leading-none">Aggregate Progress</p>
                 <div class="flex items-baseline gap-1">
-                    <h2 class="text-8xl font-black text-white tracking-tighter">{{ overall_percentage }}</h2>
-                    <span class="text-2xl font-black text-indigo-500">%</span>
+                    <h2 class="text-8xl font-black text-slate-800 tracking-tighter">{{ overall_percentage }}</h2>
+                    <span class="text-2xl font-black text-pink-500">%</span>
                 </div>
             </div>
-            <a href="{{ url_for('student.history') }}" class="h-20 w-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all transform hover:-rotate-12">
-                <svg class="h-10 w-10 text-indigo-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <a href="{{ url_for('student.history') }}" class="h-20 w-20 bg-pink-500/10 rounded-3xl flex items-center justify-center hover:bg-pink-500 hover:text-white transition-all transform hover:-rotate-12 group">
+                <svg class="h-10 w-10 text-pink-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </a>
         </div>
     </div>
 
     <!-- Alert: NIT KKR 75% Policy -->
-    <div class="mb-12 p-8 bg-rose-500/10 border border-rose-500/20 rounded-3xl flex items-center gap-6 animate-pulse">
-        <div class="h-12 w-12 bg-rose-500 rounded-2xl flex items-center justify-center flex-shrink-0 animate-bounce">
+    <div class="mb-12 p-8 bg-rose-50 border border-rose-100 rounded-3xl flex items-center gap-6">
+        <div class="h-12 w-12 bg-rose-500 rounded-2xl flex items-center justify-center flex-shrink-0">
             <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
-        <p class="text-sm font-bold text-rose-400 uppercase tracking-widest leading-relaxed">Mandatory Goal: 75% attendance. Students below this threshold will not be eligible for final examinations as per university standards.</p>
+        <p class="text-xs font-black text-rose-500 uppercase tracking-widest leading-relaxed">Institutional Goal: 75% attendance. Students below this threshold will be flagged for examination ineligibility as per university standards.</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
         {% for s in stats %}
-        <div class="premium-card p-10 flex flex-col justify-between group">
+        <div class="premium-card p-10 flex flex-col justify-between border-pink-50 group">
             <div>
-                <h4 class="text-2xl font-bold text-white mb-6 group-hover:text-indigo-400 transition-colors uppercase tracking-widest text-[14px]">{{ s.subject_name }}</h4>
+                <h4 class="text-2xl font-black text-slate-800 mb-6 group-hover:text-pink-500 transition-colors uppercase tracking-tight">{{ s.subject_name }}</h4>
                 <div class="flex items-center justify-between mb-8">
                     <div>
                         <div class="flex items-baseline gap-1">
-                            <p class="text-5xl font-black text-white">{{ s.percentage }}</p>
-                            <span class="text-xs font-black text-indigo-500">%</span>
+                            <p class="text-5xl font-black text-slate-800">{{ s.percentage }}</p>
+                            <span class="text-xs font-black text-pink-500">%</span>
                         </div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">{{ s.present }} / {{ s.total }} Sessions</p>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">{{ s.present }} / {{ s.total }} Sessions Found</p>
                     </div>
-                    <div class="h-12 w-12 rounded-2xl flex items-center justify-center {% if s.percentage < 75 %}bg-rose-500/20 text-rose-400{% else %}bg-emerald-500/20 text-emerald-400{% endif %}">
+                    <div class="h-12 w-12 rounded-2xl flex items-center justify-center {% if s.percentage < 75 %}bg-rose-500/10 text-rose-500{% else %}bg-emerald-500/10 text-emerald-500{% endif %}">
                         {% if s.percentage < 75 %}
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                         {% else %}
@@ -50,13 +50,13 @@
                     </div>
                 </div>
 
-                <div class="w-full bg-white/5 rounded-full h-2 mb-10 overflow-hidden">
-                    <div class="h-full rounded-full transition-all duration-1000 {% if s.percentage < 75 %}bg-rose-500 animate-pulse{% else %}bg-emerald-500{% endif %}" style="width: {{ s.percentage }}%"></div>
+                <div class="w-full bg-slate-100 rounded-full h-2 mb-10 overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-1000 {% if s.percentage < 75 %}bg-rose-500{% else %}bg-emerald-500{% endif %}" style="width: {{ s.percentage }}%"></div>
                 </div>
             </div>
 
-            <div class="pt-6 border-t border-white/5">
-                <p class="text-[10px] font-black uppercase tracking-widest {% if s.percentage < 75 %}text-rose-400{% else %}text-emerald-500{% endif %}">{{ s.msg }}</p>
+            <div class="pt-6 border-t border-slate-100">
+                <p class="text-[10px] font-black uppercase tracking-widest {% if s.percentage < 75 %}text-rose-500{% else %}text-emerald-500{% endif %}">{{ s.msg }}</p>
             </div>
         </div>
         {% endfor %}
