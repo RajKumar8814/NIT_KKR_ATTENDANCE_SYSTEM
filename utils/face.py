@@ -118,15 +118,23 @@ def match_faces_in_group(group_image_bytes, known_encodings_dict, tolerance=1.0)
             for roll_no, student_encodings in known_encodings_dict.items():
                 if not student_encodings: continue
                 
-                # NumPy optimized matrix distance calculation
                 for s_enc in student_encodings:
-                    s_enc_np = np.array(s_enc, dtype=np.float32)
-                    # Euclidean distance for normalized vectors
-                    dist = np.linalg.norm(u_enc - s_enc_np)
-                    
-                    if dist < tolerance and dist < min_dist:
-                        min_dist = dist
-                        best_match_roll = roll_no
+                    try:
+                        s_enc_np = np.array(s_enc, dtype=np.float32)
+                        
+                        # Shape Safety Check: buffalo_sc uses 128D, legacy models used 512D
+                        if u_enc.shape != s_enc_np.shape:
+                            continue
+
+                        # Euclidean distance for normalized vectors
+                        dist = np.linalg.norm(u_enc - s_enc_np)
+                        
+                        if dist < tolerance and dist < min_dist:
+                            min_dist = dist
+                            best_match_roll = roll_no
+                    except Exception as shape_err:
+                        # Skip incompatible vectors silently to prevent system crash
+                        continue
                         
             if best_match_roll:
                 identified_rolls.add(best_match_roll)

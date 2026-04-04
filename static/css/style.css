@@ -1,103 +1,168 @@
-/* Modern CSS Foundation for NIT KKR Smart Attendance */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap');
+
 :root {
-    --primary-blue: #2563eb;
-    --secondary-indigo: #4338ca;
-    --accent-green: #059669;
-    --error-red: #dc2626;
-    --glass-bg: rgba(255, 255, 255, 0.85);
-    --glass-border: rgba(255, 255, 255, 0.2);
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --bg-dark: #0f172a;
+    --bg-card: rgba(255, 255, 255, 0.03);
+    --border-card: rgba(255, 255, 255, 0.08);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --success: #10b981;
+    --error: #f43f5e;
+    --warning: #f59e0b;
 }
 
-/* Base Body Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    background-color: #f8fafc;
-    color: #1e293b;
-    -webkit-font-smoothing: antialiased;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
-/* Custom Scrollbar for 1GB RAM speed optimization hint */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #f1f5f9;
-}
-::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+h1, h2, h3, h4, font-bold {
+    font-family: 'Outfit', sans-serif;
 }
 
-/* Glassmorphism Classes */
-.glass-effect {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-}
-
-/* Animated Hover Transitions for Portal Buttons */
-.portal-card {
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.portal-card:hover {
-    transform: translateY(-8px) scale(1.02);
-}
-
-/* Modern Card Layouts */
-.modern-card {
-    background: white;
-    border-radius: 24px;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    border: 1px solid #f1f5f9;
-}
-
-/* Custom Navigation Focus */
-.nav-link-active {
-    color: var(--primary-blue);
-    position: relative;
-}
-.nav-link-active::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
+/* Premium Glassmorphism Background */
+.glass-overlay {
+    position: fixed;
+    top: 0;
     left: 0;
     width: 100%;
-    height: 3px;
-    background: var(--primary-blue);
-    border-radius: 2px;
+    height: 100%;
+    background: radial-gradient(circle at 10% 20%, rgba(79, 70, 229, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
+    z-index: -1;
 }
 
-/* Interactive Utility Buttons */
-.btn-primary {
-    background: var(--primary-blue);
+/* Master Navigation */
+nav {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-card);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-container {
+    max-w-7xl mx-auto px-6 h-20 flex items-center justify-between;
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 900;
+    background: linear-gradient(to right, #6366f1, #10b981);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+}
+
+/* Card System */
+.premium-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-card);
+    border-radius: 24px;
+    padding: 2.5rem;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.premium-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(99, 102, 241, 0.3);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
+}
+
+/* Buttons */
+.btn-premium {
+    background: var(--primary);
     color: white;
-    padding: 12px 24px;
-    border-radius: 12px;
     font-weight: 700;
+    padding: 1rem 2rem;
+    border-radius: 16px;
+    border: none;
+    cursor: pointer;
     transition: all 0.2s ease;
-}
-.btn-primary:hover {
-    background: var(--secondary-indigo);
-    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
 }
 
-/* Status Indicator Dots */
-.status-dot {
-    height: 8px;
-    width: 8px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 6px;
+.btn-premium:hover {
+    background: var(--primary-hover);
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
 }
-.status-online { background-color: #10b981; }
-.status-offline { background-color: #6b7280; }
 
-/* Responsive Adjustments */
-@media (max-width: 640px) {
-    .modern-card {
-        border-radius: 16px;
-    }
+.btn-danger {
+    background: rgba(244, 63, 94, 0.1);
+    color: var(--error);
+    border: 1px solid rgba(244, 63, 94, 0.2);
+}
+
+.btn-danger:hover {
+    background: var(--error);
+    color: white;
+}
+
+/* Tables */
+.premium-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+}
+
+.premium-table th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.premium-table tr td {
+    background: var(--bg-card);
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid var(--border-card);
+    border-bottom: 1px solid var(--border-card);
+}
+
+.premium-table tr td:first-child {
+    border-left: 1px solid var(--border-card);
+    border-radius: 16px 0 0 16px;
+}
+
+.premium-table tr td:last-child {
+    border-right: 1px solid var(--border-card);
+    border-radius: 0 16px 16px 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .premium-card { padding: 1.5rem; }
+    .nav-container { flex-direction: column; height: auto; padding: 1rem; }
 }

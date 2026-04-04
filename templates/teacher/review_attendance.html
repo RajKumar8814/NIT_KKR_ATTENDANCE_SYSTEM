@@ -1,39 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 py-10">
-    <div class="mb-10 text-center">
-        <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">AI Review</h1>
-        <p class="mt-2 text-lg text-gray-500 font-medium">Verify the identified students for the session on {{ data.date }}</p>
-    </div>
-
-    <form action="{{ url_for('teacher.review_attendance') }}" method="POST" class="space-y-8">
-        <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-            <div class="bg-gray-50 p-6 flex flex-col md:flex-row justify-between items-center border-b border-gray-100">
-                <div class="flex items-center space-x-2 text-sm font-black uppercase tracking-widest text-gray-400">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span>Total ID'd: {{ data.present_rolls|length }}</span>
-                </div>
-                <div class="flex space-x-4 mt-4 md:mt-0">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-black shadow-lg transition-all">Submit Final Register</button>
-                    <a href="{{ url_for('teacher.dashboard') }}" class="px-6 py-3 text-gray-400 font-bold hover:text-gray-600">Discard</a>
-                </div>
-            </div>
-
-            <div class="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<div class="max-w-4xl mx-auto py-32 animate-fade">
+    <div class="premium-card p-12">
+        <h1 class="text-4xl font-bold mb-2">AI Review</h1>
+        <p class="text-gray-400 font-medium mb-12">Verify identified students for session date <span class="text-indigo-400 font-black">{{ data.date }}</span></p>
+        
+        <form action="{{ url_for('teacher.review_attendance') }}" method="POST" class="space-y-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {% for student in students %}
-                <label class="relative flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all hover:bg-blue-50 
-                    {% if student.roll_no in data.present_rolls %} border-blue-600 bg-blue-50/50 {% else %} border-gray-100 bg-white {% endif %}">
-                    <input type="checkbox" name="present_rolls" value="{{ student.roll_no }}" 
-                           class="h-5 w-5 text-blue-600 border-gray-300 rounded-lg focus:ring-blue-600"
-                           {% if student.roll_no in data.present_rolls %} checked {% endif %}>
-                    <div class="ml-4">
-                        <p class="text-sm font-bold text-gray-900">{{ student.name }}</p>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ student.roll_no }}</p>
+                <label class="premium-card p-6 flex items-center justify-between cursor-pointer border-transparent hover:bg-white/5 transition-all
+                    {% if student.roll_no in data.present_rolls %} bg-indigo-500/10 border-indigo-500/20 {% endif %}">
+                    <div class="flex items-center gap-4">
+                        <input type="checkbox" name="present_rolls" value="{{ student.roll_no }}" 
+                               class="h-5 w-5 bg-white/5 border border-white/10 rounded-lg text-indigo-500 focus:ring-indigo-500/50"
+                               {% if student.roll_no in data.present_rolls %} checked {% endif %}>
+                        <div>
+                            <p class="font-bold text-sm text-white leading-tight">{{ student.name }}</p>
+                            <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-1">{{ student.roll_no }}</p>
+                        </div>
                     </div>
                 </label>
                 {% endfor %}
             </div>
-        </div>
-    </form>
+
+            <div class="flex gap-4 pt-12 border-t border-white/5">
+                <a href="{{ url_for('teacher.dashboard') }}" class="flex-1 btn-premium bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-bold uppercase tracking-widest h-16">Discard Scan</a>
+                <button class="flex-2 btn-premium w-full h-16 text-lg uppercase tracking-widest" type="submit">
+                    Save Final Attendance → 
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

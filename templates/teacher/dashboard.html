@@ -1,45 +1,45 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-10">
-    <div class="mb-12 flex flex-col md:flex-row justify-between items-center bg-white p-10 rounded-3xl border border-gray-100 shadow-sm">
-        <div class="text-center md:text-left mb-6 md:mb-0">
-            <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">Faculty Dashboard</h1>
-            <p class="mt-2 text-lg text-gray-500 font-medium">NIT KKR Academic Portal for <span class="text-blue-600 font-bold">{{ teacher.name }}</span></p>
+<div class="py-12 animate-fade">
+    <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
+        <div>
+            <h1 class="text-6xl font-bold tracking-tighter text-white mb-2">Faculty Dashboard</h1>
+            <p class="text-gray-400 font-medium font-inter uppercase tracking-widest text-[10px]">Welcome, Professor <span class="text-indigo-400 font-black">{{ teacher.name }}</span> | NIT Kurukshetra</p>
         </div>
-        <div class="flex space-x-4">
-            <a href="{{ url_for('teacher.reports') }}" class="bg-white border-2 border-gray-100 text-gray-700 hover:border-blue-600 px-6 py-4 rounded-2xl font-bold transition-all">View Reports</a>
-            <a href="{{ url_for('teacher.setup_attendance') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-blue-200 transition-all">+ Take Attendance</a>
+        <div class="flex gap-4">
+            <a href="{{ url_for('teacher.reports') }}" class="btn-premium bg-white/5 border border-white/10 hover:bg-white/10 uppercase tracking-widest text-xs h-14">View History</a>
+            <a href="{{ url_for('teacher.setup_attendance') }}" class="btn-premium uppercase tracking-widest h-14">Take Attendance</a>
         </div>
     </div>
 
-    <h3 class="text-xl font-black text-gray-900 mb-8 uppercase tracking-widest border-b border-gray-100 pb-4">Assigned Subjects</h3>
+    <!-- Active Subjects -->
+    <h3 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-8 border-b border-white/5 pb-2">Assigned Subject Load</h3>
     
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {% if subjects %}
             {% for sub in subjects %}
-            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 hover:shadow-xl hover:-translate-y-1 transition-all group">
-                <div class="flex justify-between items-start mb-6">
-                    <div class="h-12 w-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 group-hover:bg-blue-100 transition-colors">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                    </div>
-                    <span class="text-[10px] font-black uppercase tracking-widest text-blue-400 bg-blue-50 px-2 py-1 rounded-md">ID: {{ sub.subject_id[:5] }}</span>
-                </div>
-                <h4 class="text-2xl font-black text-gray-900 mb-2">{{ sub.name }}</h4>
-                <p class="text-gray-500 font-bold mb-8 uppercase tracking-tighter text-xs">{{ sub.class_name }}</p>
-                <div class="pt-6 border-t border-gray-50 flex items-center justify-between">
+            <div class="premium-card p-10 flex flex-col justify-between group">
+                <div class="flex items-start justify-between mb-8">
                     <div>
-                        <p class="text-2xl font-black text-blue-600">{{ sub.total_lectures }}</p>
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Total Lectures</p>
+                        <h4 class="text-3xl font-bold text-white mb-2 leading-tight group-hover:text-indigo-400 transition-colors">{{ sub.name }}</h4>
+                        <p class="text-xs font-black text-gray-500 uppercase tracking-widest">{{ sub.class_name }}</p>
                     </div>
-                    <a href="{{ url_for('teacher.setup_attendance') }}" class="h-10 w-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </div>
+
+                <div class="pt-8 border-t border-white/5 flex items-center justify-between">
+                    <div class="text-left">
+                        <p class="text-xs font-black text-gray-500 uppercase tracking-widest mb-1">Sessions Held</p>
+                        <p class="text-4xl font-black text-white">{{ sub.total_lectures }}<span class="text-xs text-gray-600 ml-1">/ 34</span></p>
+                    </div>
+                    <a href="{{ url_for('teacher.setup_attendance') }}" class="h-14 w-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-400 hover:bg-indigo-500 hover:text-white transition-all transform hover:rotate-12">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                     </a>
                 </div>
             </div>
             {% endfor %}
         {% else %}
-            <div class="col-span-full py-20 text-center bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-                <p class="text-gray-400 font-bold italic">No subjects assigned by system admin.</p>
+            <div class="col-span-full py-32 text-center premium-card bg-transparent border-dashed border-white/5">
+                <p class="text-xs font-black text-gray-600 uppercase tracking-widest animate-pulse">No academic assignments found</p>
             </div>
         {% endif %}
     </div>

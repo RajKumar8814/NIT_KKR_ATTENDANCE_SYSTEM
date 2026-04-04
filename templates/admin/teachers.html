@@ -1,48 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-10">
-    <div class="flex flex-col md:flex-row justify-between items-center mb-10 border-b border-gray-100 pb-8">
+<div class="py-12 animate-fade">
+    <div class="flex items-end justify-between mb-16 gap-4">
         <div>
-            <h1 class="text-3xl font-black text-gray-900 tracking-tight">Faculty Management</h1>
-            <p class="text-gray-500 font-medium mt-1">Register teachers and monitor subject assignments</p>
+            <h1 class="text-6xl font-bold tracking-tighter text-white mb-2">Staff Directory</h1>
+            <p class="text-gray-400 font-medium">Manage faculty enrollment and subject assignments.</p>
         </div>
-        <button onclick="document.getElementById('teacher-modal').classList.toggle('hidden')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-2xl shadow-lg transition-all mt-4 md:mt-0">
-            + New Faculty Profile
-        </button>
+        <button onclick="document.getElementById('teacher-modal').classList.toggle('hidden')" class="btn-premium">Register Teacher</button>
     </div>
 
     <!-- Teacher Table -->
-    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden overflow-x-auto">
-        <table class="w-full text-left">
-            <thead class="bg-gray-50 border-b border-gray-100">
+    <div class="premium-card p-0 overflow-hidden overflow-x-auto border-none bg-transparent">
+        <table class="premium-table">
+            <thead>
                 <tr>
-                    <th class="px-8 py-5 text-sm font-black text-gray-400 uppercase tracking-widest">Faculty Name</th>
-                    <th class="px-8 py-5 text-sm font-black text-gray-400 uppercase tracking-widest">Email Address</th>
-                    <th class="px-8 py-5 text-sm font-black text-gray-400 uppercase tracking-widest">Load</th>
-                    <th class="px-8 py-5 text-sm font-black text-gray-400 uppercase tracking-widest">Status</th>
+                    <th class="w-1/3">Faculty Name</th>
+                    <th class="w-1/3">Email Address</th>
+                    <th class="w-1/6">Subj. Load</th>
+                    <th class="w-1/6">Actions</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-50">
+            <tbody>
                 {% for teacher in teachers %}
-                <tr class="hover:bg-blue-50 transition-colors group">
-                    <td class="px-8 py-6">
-                        <div class="flex items-center">
-                            <div class="h-10 w-10 rounded-xl bg-green-100 flex items-center justify-center font-bold text-green-600 mr-4">
-                                {{ teacher.name[0] }}
-                            </div>
-                            <p class="text-sm font-bold text-gray-900">{{ teacher.name }}</p>
-                        </div>
-                    </td>
-                    <td class="px-8 py-6 text-sm text-gray-500">{{ teacher.email }}</td>
-                    <td class="px-8 py-6">
-                        <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700">
-                            {{ teacher.subjects|length if teacher.subjects else 0 }} Subjects
-                        </span>
-                    </td>
-                    <td class="px-8 py-6">
-                        <span class="flex items-center text-xs font-bold text-green-600">
-                            <span class="h-2 w-2 rounded-full bg-green-500 mr-2"></span> Active
-                        </span>
+                <tr class="group">
+                    <td><div class="flex items-center gap-4"><div class="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center font-black text-indigo-400">{{ teacher.name[0] }}</div><p class="font-bold text-lg text-white">{{ teacher.name }}</p></div></td>
+                    <td><p class="font-medium text-gray-400">{{ teacher.email }}</p></td>
+                    <td><span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black bg-indigo-500/10 text-indigo-400 uppercase tracking-widest">{{ teacher.subjects|length if teacher.subjects else 0 }} Subjects</span></td>
+                    <td class="flex justify-start">
+                        <form action="{{ url_for('admin.delete_teacher', email=teacher.email) }}" method="POST" onsubmit="return confirm('Remove this teacher from the system?')">
+                            <button type="submit" class="btn-premium btn-danger h-10 px-4 text-xs">Remove</button>
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}
@@ -50,22 +37,24 @@
         </table>
     </div>
 
-    <!-- Faculty Registration Modal -->
-    <div id="teacher-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-10 transform transition-all">
-            <h2 class="text-2xl font-black text-gray-900 mb-6">Register Faculty</h2>
+    <!-- Registration Modal -->
+    <div id="teacher-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-xl z-50 flex items-center justify-center p-6">
+        <div class="premium-card w-full max-w-md animate-fade">
+            <h2 class="text-4xl font-bold mb-2">Register Faculty</h2>
+            <p class="text-gray-500 font-medium mb-12">All registered teachers can use the portal via OTP.</p>
+            
             <form action="{{ url_for('admin.manage_teachers') }}" method="POST" class="space-y-6">
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Professor Name</label>
-                    <input type="text" name="name" placeholder="Name" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-600 focus:outline-none" required>
+                    <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Full Name</label>
+                    <input type="text" name="name" placeholder="Professor Name" class="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
-                    <input type="email" name="email" placeholder="example@gmail.com" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-600 focus:outline-none" required>
+                    <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Email Address</label>
+                    <input type="email" name="email" placeholder="example@college.edu" class="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
                 </div>
-                <div class="flex space-x-4">
-                    <button type="button" onclick="document.getElementById('teacher-modal').classList.add('hidden')" class="flex-1 py-4 text-gray-500 font-bold hover:bg-gray-50 rounded-2xl transition-all">Cancel</button>
-                    <button type="submit" class="flex-1 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all">Register Faculty</button>
+                <div class="flex gap-4 pt-4">
+                    <button type="button" onclick="document.getElementById('teacher-modal').classList.add('hidden')" class="flex-1 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest hover:text-white">Cancel</button>
+                    <button type="submit" class="btn-premium flex-1 h-14">Register Staff</button>
                 </div>
             </form>
         </div>

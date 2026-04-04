@@ -126,3 +126,36 @@ def reports():
         log["present_count"] = len(log.get("present_roll_nos", []))
             
     return render_template("teacher/reports.html", logs=logs)
+
+@teacher_bp.route("/attendance/delete/<att_id>", methods=["POST"])
+def delete_attendance(att_id):
+    db = get_db()
+    from bson.objectid import ObjectId
+    
+    record = db.attendance.find_one({"_id": ObjectId(att_id)})
+    if not record:
+        flash("Attendance record not found.", "error")
+        return redirect(url_for("teacher.reports"))
+        
+    if record["teacher_email"] != session.get("user"):
+        flash("Unauthorized action.", "error")
+        return redirect(url_for("teacher.reports"))
+        
+    # Remove record
+    db.attendance.delete_one({"_id": ObjectId(att_id)})
+    
+    # Decrease total_lectures but block at zero (Security check)
+    db.classes.update_one(
+        {"_id": record["class_id"], "subjects.subject_id": record["subject_id"]},
+        {"$inc": {"subjects.$.total_lectures": -1}}
+    )
+    
+    # Secondary cleanup: Ensure it didn't go negative (MongoDB 4.2+ doesn't support $max in atomic $inc logic easily without expressions)
+    # We'll just do a quick fix-up if it hit -1
+    db.classes.update_one(
+        {"_id": record["class_id"], "subjects.subject_id": record["subject_id"], "subjects.total_lectures": {"$lt": 0}},
+        {"$set": {"subjects.$.total_lectures": 0}}
+    )
+    
+    flash("Session removed and lecture count updated.", "success")
+    return redirect(url_for("teacher.reports"))

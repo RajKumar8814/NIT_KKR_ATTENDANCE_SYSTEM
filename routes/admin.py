@@ -94,6 +94,18 @@ def add_subject(class_id):
         
     return redirect(url_for("admin.manage_classes"))
 
+@admin_bp.route("/teachers/delete/<email>", methods=["POST"])
+def delete_teacher(email):
+    db = get_db()
+    # Unbind from subjects first to prevent orphans
+    db.classes.update_many(
+        {"subjects.teacher_email": email},
+        {"$set": {"subjects.$.teacher_email": ""}}
+    )
+    db.teachers.delete_one({"email": email})
+    flash("Teacher removed from system.", "success")
+    return redirect(url_for("admin.manage_teachers"))
+
 # --- Student Management ---
 @admin_bp.route("/students", methods=["GET", "POST"])
 def manage_students():
@@ -137,7 +149,7 @@ def manage_students():
             "roll_no": roll_no, "name": name, "email": email,
             "class_id": class_id, "encodings": encodings, "image_urls": image_urls
         })
-        flash(f"Student '{name}' added with {len(encodings)} biometric markers.", "success")
+        flash(f"Student '{name}' added successfully.", "success")
         return redirect(url_for("admin.manage_students"))
         
     students = list(db.students.find())
@@ -148,5 +160,5 @@ def manage_students():
 def delete_student(roll_no):
     db = get_db()
     db.students.delete_one({"roll_no": roll_no})
-    flash("Biometric data purged.", "success")
+    flash("Student removed successfully.", "success")
     return redirect(url_for("admin.manage_students"))

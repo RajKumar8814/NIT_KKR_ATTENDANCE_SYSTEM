@@ -1,52 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-10">
-    <div class="flex flex-col md:flex-row justify-between items-center mb-10 border-b border-gray-100 pb-8">
+<div class="py-12 animate-fade">
+    <div class="flex items-end justify-between mb-16 gap-4">
         <div>
-            <h1 class="text-3xl font-black text-gray-900 tracking-tight">Biometric Database</h1>
-            <p class="text-gray-500 font-medium mt-1">Capture face vectors and manage enrollment records</p>
+            <h1 class="text-6xl font-bold tracking-tighter text-white mb-2">Student Records</h1>
+            <p class="text-gray-400 font-medium font-inter">Manage enrollment and capture face-embedding data.</p>
         </div>
-        <button onclick="document.getElementById('enroll-modal').classList.toggle('hidden')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-2xl shadow-lg transition-all mt-4 md:mt-0">
-            + Enroll New Student
-        </button>
+        <button onclick="document.getElementById('student-modal').classList.toggle('hidden')" class="btn-premium">Enroll Student</button>
     </div>
 
     <!-- Student Table -->
-    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden overflow-x-auto">
-        <table class="w-full text-left">
-            <thead class="bg-gray-50 border-b border-gray-100">
+    <div class="premium-card p-0 overflow-hidden overflow-x-auto border-none bg-transparent">
+        <table class="premium-table">
+            <thead>
                 <tr>
-                    <th class="px-8 py-5 text-sm font-black text-gray-400 uppercase tracking-widest">Student</th>
-                    <th class="px-8 py-5 text-sm font-black text-gray-400 uppercase tracking-widest">Roll Number</th>
-                    <th class="px-8 py-5 text-sm font-black text-gray-400 uppercase tracking-widest">Class ID</th>
-                    <th class="px-8 py-5 text-sm font-black text-gray-400 uppercase tracking-widest">Markers</th>
-                    <th class="px-8 py-5 text-sm font-black text-gray-400 uppercase tracking-widest">Actions</th>
+                    <th class="w-1/4">Full Name</th>
+                    <th class="w-1/6">Roll No</th>
+                    <th class="w-1/6">Class ID</th>
+                    <th class="w-1/6">Biometric Status</th>
+                    <th class="w-1/6">Actions</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-50">
+            <tbody>
                 {% for student in students %}
-                <tr class="hover:bg-blue-50 transition-colors group">
-                    <td class="px-8 py-6">
-                        <div class="flex items-center space-x-4">
-                            <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-600">
-                                {{ student.name[0] }}
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold text-gray-900">{{ student.name }}</p>
-                                <p class="text-xs text-gray-500">{{ student.email }}</p>
-                            </div>
-                        </div>
+                <tr class="group">
+                    <td><div class="flex items-center gap-4"><div class="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center font-black text-emerald-400 uppercase tracking-tighter">{{ student.name[0] }}</div><p class="font-bold text-lg text-white">{{ student.name }}</p></div></td>
+                    <td><code class="text-xs font-black text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-lg">{{ student.roll_no }}</code></td>
+                    <td><p class="text-xs font-bold text-gray-500 uppercase tracking-widest">{{ student.class_id[:8] }}...</p></td>
+                    <td>
+                        {% if student.encodings %}
+                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-400 uppercase tracking-widest">Active ({{ student.encodings|length }})</span>
+                        {% else %}
+                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black bg-rose-500/10 text-rose-400 uppercase tracking-widest text-center">Missing Data</span>
+                        {% endif %}
                     </td>
-                    <td class="px-8 py-6 text-sm font-bold text-gray-700">{{ student.roll_no }}</td>
-                    <td class="px-8 py-6 text-xs font-black text-gray-400">{{ student.class_id[:8] }}...</td>
-                    <td class="px-8 py-6">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800">
-                            {{ student.encodings|length if student.encodings else 0 }} Vectors
-                        </span>
-                    </td>
-                    <td class="px-8 py-6">
-                        <form action="{{ url_for('admin.delete_student', roll_no=student.roll_no) }}" method="POST" onsubmit="return confirm('Purge biometric data for this student?')">
-                            <button type="submit" class="text-red-400 hover:text-red-600 font-bold text-xs uppercase tracking-widest">Purge</button>
+                    <td class="flex justify-start">
+                        <form action="{{ url_for('admin.delete_student', roll_no=student.roll_no) }}" method="POST" onsubmit="return confirm('Remove student data from system?')">
+                            <button type="submit" class="btn-premium btn-danger h-10 px-4 text-xs font-bold uppercase tracking-widest">Remove</button>
                         </form>
                     </td>
                 </tr>
@@ -56,28 +46,28 @@
     </div>
 
     <!-- Enrollment Modal -->
-    <div id="enroll-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-10 max-h-[90vh] overflow-y-auto">
-            <h2 class="text-2xl font-black text-gray-900 mb-2">Enrollment Portal</h2>
-            <p class="text-sm text-gray-500 mb-8 italic">Upload up to 5 clear photos of the student's face for AI training.</p>
+    <div id="student-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-xl z-50 flex items-center justify-center p-6">
+        <div class="premium-card w-full max-w-2xl animate-fade max-h-[90vh] overflow-y-auto">
+            <h2 class="text-4xl font-bold mb-4">Enroll New Student</h2>
+            <p class="text-emerald-400 font-bold mb-12 flex items-center gap-2 text-sm uppercase tracking-widest"> Capture up to 5 clear photos for AI analysis</p>
             
             <form action="{{ url_for('admin.manage_students') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Full Name</label>
-                        <input type="text" name="name" placeholder="Raj Kumar" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-600 focus:outline-none" required>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Student Name</label>
+                        <input type="text" name="name" placeholder="Full Name" class="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Roll Number</label>
-                        <input type="text" name="roll_no" placeholder="1211XXXX" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-600 focus:outline-none" required>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Roll Number</label>
+                        <input type="text" name="roll_no" placeholder="Roll No" class="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
-                        <input type="email" name="email" placeholder="example@gmail.com" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-600 focus:outline-none" required>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Email Address</label>
+                        <input type="email" name="email" placeholder="example@college.edu" class="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Academic Class</label>
-                        <select name="class_id" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-600 focus:outline-none" required>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Assigned Class</label>
+                        <select name="class_id" class="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none" required>
                             <option value="">-- Choose Class --</option>
                             {% for cls in classes %}
                             <option value="{{ cls._id }}">{{ cls.name }}</option>
@@ -87,26 +77,19 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Biometric Photos (Max 5)</label>
-                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-100 border-dashed rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer relative">
-                        <div class="space-y-1 text-center">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                            <div class="flex text-sm text-gray-600">
-                                <span class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">Upload files</span>
-                                <p class="pl-1">or drag and drop</p>
-                            </div>
-                            <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                    <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Initial Biometric Profile (Max 5 Image Files)</label>
+                    <div class="relative group cursor-pointer border-2 border-dashed border-white/10 rounded-3xl p-10 bg-white/1 hover:bg-white/5 transition-all text-center">
+                        <div class="space-y-4">
+                            <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">Drop files or click to upload</p>
+                            <p class="text-gray-600 text-xs font-bold uppercase tracking-widest">Up to 5 images for maximum accuracy</p>
                         </div>
                         <input type="file" name="photos" class="absolute inset-0 opacity-0 cursor-pointer" multiple accept="image/*" required>
                     </div>
                 </div>
 
-                <div class="flex space-x-4 pt-4 border-t border-gray-50">
-                    <button type="button" onclick="document.getElementById('enroll-modal').classList.add('hidden')" class="flex-1 py-4 text-gray-500 font-bold hover:bg-gray-50 rounded-2xl transition-all">Cancel</button>
-                    <button type="submit" class="flex-1 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all">Begin AI Enrollment</button>
-                </div>
-                <div class="text-center">
-                    <p class="text-[10px] text-gray-400 uppercase tracking-tighter">Images will be stored securely on Cloudinary and vectors on MongoDB Atlas.</p>
+                <div class="flex gap-4 pt-4 border-t border-white/5 mt-8">
+                    <button type="button" onclick="document.getElementById('student-modal').classList.add('hidden')" class="flex-1 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest hover:text-white">Cancel</button>
+                    <button type="submit" class="btn-premium flex-1 h-14 bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20">Enroll Student Profile</button>
                 </div>
             </form>
         </div>
