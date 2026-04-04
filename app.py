@@ -1,6 +1,6 @@
 import os
 import gc
-from flask import Flask, redirect, url_for, session
+from flask import Flask, redirect, url_for, session, render_template
 from dotenv import load_dotenv
 from utils.db import init_db, mongo # Import mongo directly here too
 
@@ -44,17 +44,24 @@ def create_app():
                 return redirect(url_for("teacher.dashboard"))
             elif role == "student":
                 return redirect(url_for("student.dashboard"))
-        return redirect(url_for("auth.login"))
+        # Deliver unified multi-portal selection 
+        return render_template("home.html")
 
-    # Global Error Handler: Injects backend crash tracebacks instantly to the browser for debugging
+    # Global Error Handlers gracefully intercepting exceptions preventing entire application crash boundaries
+    @app.errorhandler(404)
+    def page_not_found(e):
+        error_context = "The page you are looking for does not exist."
+        return render_template("base.html", title="404 Not Found", error_block=error_context), 404
+        
     @app.errorhandler(Exception)
     def handle_exception(e):
         import traceback
-        error_trace = traceback.format_exc()
-        # Cleanly return the trace to the user UI safely bypassing normal internal 500 HTML
-        return f"<h1>Traceback Captured</h1><pre style='background:#f8f8f8;padding:20px;border:1px solid #ddd;overflow-x:auto;'>{error_trace}</pre>", 500
+        import logging
+        logging.error(traceback.format_exc())
+        error_context = "An unexpected server operation timed out or failed. Our system successfully caught the error."
+        return render_template("base.html", title="500 Internal Error", error_block=error_context), 500
 
-    # Cleanup memory after initialization
+    # Cleanup memory after initialization guaranteeing lightweight footprints natively
     gc.collect()
     
     return app

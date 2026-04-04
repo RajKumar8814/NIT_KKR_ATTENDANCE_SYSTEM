@@ -1,1 +1,1 @@
-web: gunicorn app:app --timeout 180
+web: gunicorn app:app -k uvicorn.workers.UvicornWorker --workers 1 --timeout 180

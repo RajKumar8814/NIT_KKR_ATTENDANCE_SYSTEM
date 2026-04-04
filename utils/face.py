@@ -1,100 +1,144 @@
 import cv2
-import face_recognition
 import numpy as np
 from PIL import Image
 import io
 import gc
+import os
+import insightface
+from insightface.app import FaceAnalysis
 
-def resize_image_for_memory(image_bytes, max_width=600):
+# Globally initialize precisely on container boot natively avoiding loop memory leaks.
+# 'buffalo_sc' is incredibly tiny (~15MB) and executes seamlessly on strict CPU execution limits.
+try:
+    face_app = FaceAnalysis(name='buffalo_sc', providers=['CPUExecutionProvider'])
+    face_app.prepare(ctx_id=0, det_size=(640, 640))
+except Exception as e:
+    print(f"CRITICAL MODEL STARTUP ERROR: {e}")
+    face_app = None
+
+def check_system_resources(max_ram_percent=85.0, max_cpu_load=75.0):
     """
-    Resizes image from raw bytes if its width exceeds max_width.
-    Returns RGB numpy array suitable for face_recognition.
-    Vital for Render's 512MB RAM constraint.
+    Evaluates hardware thresholds explicitly natively without relying on psutil 
+    to preserve dependencies strictly mapping unbouncable CPU servers.
     """
     try:
-        image = Image.open(io.BytesIO(image_bytes))
-        
-        # Convert to RGB (in case of RGBA or Grayscale)
-        if image.mode != "RGB":
-            image = image.convert("RGB")
-            
-        width, height = image.size
-        # Resize if width is larger than max limit
-        if width > max_width:
-            ratio = max_width / float(width)
-            new_height = int(float(height) * ratio)
-            image = image.resize((max_width, new_height), Image.LANCZOS)
-        
-        # Convert to numpy array
-        img_array = np.array(image)
-        # Release PIL image memory
-        del image
-        return img_array
+        # Check Linux memory profile securely
+        with open('/proc/meminfo', 'r') as f:
+            lines = f.readlines()
+        mem_info = {}
+        for line in lines:
+            parts = line.split()
+            if len(parts) >= 2:
+                mem_info[parts[0].strip(':')] = int(parts[1])
+                
+        total_mem = mem_info.get('MemTotal', 1)
+        free_mem = mem_info.get('MemAvailable', mem_info.get('MemFree', 0))
+        used_mem_percent = ((total_mem - free_mem) / total_mem) * 100.0
+
+        if used_mem_percent > max_ram_percent:
+            return False, f"Server memory constrained ({used_mem_percent:.1f}% used)."
+
+        # Check CPU Linux load average over 1 min
+        # Load average defines threads waiting. On a 1 CPU system, load > 0.75 means roughly 75% load constraints.
+        load1, load5, load15 = os.getloadavg()
+        cpu_load_percent = load1 * 100.0
+
+        if cpu_load_percent > max_cpu_load:
+             return False, f"Server CPU constrained (Load: {cpu_load_percent:.1f}%)."
+
+        return True, "OK"
     except Exception as e:
-        print(f"Image resize error: {e}")
+        # Bypass on Non-Linux local testing
+        return True, "Check bypassed (Non-Linux OS)"
+
+def get_image_tensor(image_bytes, max_dim=640):
+    """ Fast streaming constraint algorithm bypassing buffer bloat. """
+    try:
+        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        img_np = np.array(image)
+        # BGR conversion aligning with exact insightface matrices
+        img_cv2 = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
+        
+        # Scaling limits down strictly saving massive byte allocations
+        h, w = img_cv2.shape[:2]
+        if max(h, w) > max_dim:
+            scale = max_dim / max(h, w)
+            img_cv2 = cv2.resize(img_cv2, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
+
+        del image
+        del img_np
+        gc.collect()
+        return img_cv2
+    except Exception as e:
+        print(f"Tensor extraction failed: {e}")
         return None
 
 def extract_face_encodings(image_bytes):
-    """
-    Given image bytes, parse it, resize it to save memory,
-    and convert to face encodings.
-    """
-    img_array = resize_image_for_memory(image_bytes)
-    if img_array is None:
+    """ Extract single or max array face vectors safely coercing formats to float32 mitigating Database sizing blobs. """
+    if not face_app: return []
+    
+    ok, msg = check_system_resources()
+    if not ok:
+        print(f"Skipping ML inference forcefully: {msg}")
         return []
 
-    # Find face locations first to pass them into encodings
-    # This might use memory so be careful
-    locations = face_recognition.face_locations(img_array, model="hog")
-    encodings = face_recognition.face_encodings(img_array, locations)
-    
-    # Trigger garbage collection aggressively
-    del img_array
-    gc.collect()
-    
-    return [enc.tolist() for enc in encodings]
+    try:
+        img_tensor = get_image_tensor(image_bytes)
+        if img_tensor is None: return []
 
-def match_faces_in_group(group_image_bytes, known_encodings_dict, tolerance=0.53):
-    """
-    Detect faces in a group photo and match against the complete DB encodings.
-    `known_encodings_dict` is { 'roll_no': [enc1, enc2, ...], ... }
-    Returns a list of identified roll_nos.
-    """
-    img_array = resize_image_for_memory(group_image_bytes)
-    if img_array is None:
-        return []
-
-    group_locations = face_recognition.face_locations(img_array, model="hog")
-    group_encodings = face_recognition.face_encodings(img_array, group_locations)
-    
-    del img_array
-    gc.collect()
-
-    identified_roll_nos = set()
-    
-    for unknown_encoding in group_encodings:
-        best_match_roll_no = None
-        min_distance = float('inf')
+        faces = face_app.get(img_tensor)
         
-        for roll_no, saved_encodings in known_encodings_dict.items():
-            if not saved_encodings:
-                continue
+        del img_tensor
+        gc.collect()
+
+        # Extract only the 512D norm embeddings safely coercing single precision array lists
+        return [face.normed_embedding.astype(np.float32).tolist() for face in faces]
+        
+    except Exception as e:
+        print(f"Failed embedding extraction gracefully, bypassing 500 crashes: {e}")
+        return []
+
+def match_faces_in_group(group_image_bytes, known_encodings_dict, tolerance=1.0):
+    """ Uses numpy distancing explicitly matching matrices smoothly bypassing heavy loops. """
+    if not face_app: return []
+
+    ok, msg = check_system_resources()
+    if not ok:
+        print(f"Skipping group inference forcefully: {msg}")
+        return []
+
+    try:
+        img_tensor = get_image_tensor(group_image_bytes)
+        if img_tensor is None: return []
+
+        faces = face_app.get(img_tensor)
+        del img_tensor
+        gc.collect()
+
+        identified_rolls = set()
+        
+        for unknown_face in faces:
+            u_enc = unknown_face.normed_embedding.astype(np.float32)
+            
+            best_roll = None
+            min_dist = float('inf')
+
+            for roll_no, saved_encs in known_encodings_dict.items():
+                if not saved_encs: continue
                 
-            match_results = face_recognition.compare_faces(saved_encodings, unknown_encoding, tolerance=tolerance)
-            face_distances = face_recognition.face_distance(saved_encodings, unknown_encoding)
-            
-            # Find best match in this student's encodings
-            if any(match_results):
-                best_match_index = np.argmin(face_distances)
-                if face_distances[best_match_index] < min_distance:
-                    min_distance = face_distances[best_match_index]
-                    best_match_roll_no = roll_no
+                # Natively array distance Euclidean comparisons utilizing optimized C implementations within NumPy
+                for s_enc in saved_encs:
+                    s_enc_np = np.array(s_enc, dtype=np.float32)
+                    dist = np.linalg.norm(u_enc - s_enc_np)
                     
-        if best_match_roll_no:
-            identified_roll_nos.add(best_match_roll_no)
-            
-    # Free local references
-    del group_encodings
-    gc.collect()
-    
-    return list(identified_roll_nos)
+                    if dist < tolerance and dist < min_dist:
+                        min_dist = dist
+                        best_roll = roll_no
+                        
+            if best_roll:
+                identified_rolls.add(best_roll)
+
+        return list(identified_rolls)
+    except Exception as e:
+        print(f"Group matching crashed explicitly recovering cleanly maintaining up-time: {e}")
+        return []

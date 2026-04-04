@@ -4,6 +4,8 @@ from utils.auth import role_required
 from utils.db import get_db
 from utils.face import extract_face_encodings
 import uuid
+import cloudinary.uploader
+import io
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -192,18 +194,31 @@ def manage_students():
             return redirect(url_for("admin.manage_students"))
             
         encodings = []
+        image_urls = []
         for file in photos[:5]: # Ensure absolute max 5 photos
             if file and file.filename != '':
                 image_bytes = file.read()
                 try:
                     encs = extract_face_encodings(image_bytes)
                     if encs:
-                        # Append the first face found in the image. encs[0] is already a Python list.
+                        # Append the first face found in the image safely
                         encodings.append(encs[0])
+                        
+                        # Upload successfully decoded images straight to Cloud resource skipping local disks completely
+                        try:
+                            upload_result = cloudinary.uploader.upload(
+                                io.BytesIO(image_bytes), 
+                                folder=f"attendance_sys/students/{roll_no}"
+                            )
+                            secure_url = upload_result.get("secure_url")
+                            if secure_url:
+                                image_urls.append(secure_url)
+                        except Exception as cloud_err:
+                            print(f"Transient Cloudinary mapping bypassed gracefully preventing application crashes: {cloud_err}")
                 except Exception as e:
-                    print("Error extracting encoding:", e)
+                    print(f"Error extracting encoding safely isolated: {e}")
                 finally:
-                    # Memory Purge
+                    # Explicit Memory Purge mitigating Docker deadlocks
                     del image_bytes
                     import gc
                     gc.collect()
@@ -219,7 +234,8 @@ def manage_students():
             "branch": branch,
             "year": year,
             "class_id": class_id,
-            "encodings": encodings
+            "encodings": encodings,
+            "image_urls": image_urls
         })
         flash(f"Student added successfully with {len(encodings)} encodings", "success")
         return redirect(url_for("admin.manage_students"))

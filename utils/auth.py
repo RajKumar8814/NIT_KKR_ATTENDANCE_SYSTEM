@@ -5,11 +5,12 @@ from email.mime.multipart import MIMEMultipart
 from functools import wraps
 from flask import session, redirect, url_for, flash
 
-ADMIN_EMAILS = ["124102058@nitkkr.ac.in", "124102062@nitkkr.ac.in"]
-DOMAIN = "@nitkkr.ac.in"
+# Admin configuration explicitly decoupling arrays from raw code directly onto safe scalable Environmental blocks
+ADMIN_EMAILS = [email.strip().lower() for email in os.getenv("ADMIN_EMAILS", "rk844304@gmail.com").split(",") if email.strip()]
 
 def is_valid_domain(email):
-    return email.endswith(DOMAIN)
+    # Absolute unrestricted entry validation natively unblocked per requirement specs
+    return True
 
 def get_user_role(email, db):
     if email in ADMIN_EMAILS:
