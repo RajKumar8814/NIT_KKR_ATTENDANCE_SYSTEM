@@ -13,7 +13,7 @@ try:
     # Synchronous pre-load of the model at application startup to avoid first-request timeout
     # ctx_id=0 means CPU-only mode
     face_app = FaceAnalysis(name='buffalo_sc', providers=['CPUExecutionProvider'])
-    face_app.prepare(ctx_id=0, det_size=(640, 640))
+    face_app.prepare(ctx_id=0, det_size=(640, 640), det_thresh=0.4)
 except Exception as e:
     print(f"CRITICAL: Failed to load InsightFace Model on boot: {e}")
     face_app = None
@@ -114,7 +114,7 @@ def match_faces_in_group(group_image_bytes, known_encodings_dict, tolerance=1.0)
         # Lower det_thresh to 0.4 for improved scanning of back rows and occlusions
         # Wrapped in extra try to catch specific AI core timeouts
         try:
-            faces = face_app.get(img_tensor, det_thresh=0.4)
+            faces = face_app.get(img_tensor)
         except Exception as ai_err:
             return [], f"AI Detection Failed: {ai_err}. (Tip: Try a smaller photo)"
 
