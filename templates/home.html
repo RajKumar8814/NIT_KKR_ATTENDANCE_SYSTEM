@@ -2,42 +2,39 @@
 {% block content %}
 <div class="py-24 animate-fade">
     <div class="text-center mb-24 max-w-4xl mx-auto">
-        <h1 class="text-8xl font-black tracking-tighter text-white mb-6 leading-none">Attendance <br> Systems</h1>
-        <p class="text-xl font-bold text-amber-500/80 uppercase tracking-[0.4em] font-heading">National Institute of Technology Kurukshetra</p>
+        <h1 class="text-8xl font-black text-slate-800 tracking-tighter mb-6 leading-none">Smart <br> Attendance</h1>
+        <p class="text-xl font-black text-pink-400 uppercase tracking-[0.4em] font-heading">NIT Kurukshetra | Biometric Academic Ecosystem</p>
     </div>
 
-    <!-- NIT KKR Brand Entrance Portals -->
+    <!-- Light Entrance Portals -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-7xl mx-auto px-6">
-        <!-- Admin Access (Crimson Theme) -->
-        <a href="{{ url_for('auth.login', role='admin') }}" class="premium-card group border-red-500/10 hover:border-red-500/40 relative">
-            <div class="absolute -top-24 -right-24 w-48 h-48 bg-red-600/10 blur-3xl rounded-full group-hover:bg-red-600/20 transition-all"></div>
-            <div class="text-5xl mb-8 group-hover:scale-110 transition-transform origin-left">🛡️</div>
-            <h2 class="text-4xl font-extrabold text-white mb-4 group-hover:text-red-500 transition-colors">Admin Console</h2>
-            <p class="text-gray-400 font-medium mb-12 h-20 text-lg leading-relaxed">Centralized oversight for student biometric enrollment and faculty directory management.</p>
-            <div class="btn-premium w-full text-center">Open Dashboard →</div>
+        <!-- Admin Access -->
+        <a href="{{ url_for('auth.login', role='admin') }}" class="premium-card group border-pink-50 hover:bg-pink-50/50">
+            <div class="text-5xl mb-8">🛡️</div>
+            <h2 class="text-4xl font-black text-slate-800 mb-4 group-hover:text-pink-500 transition-colors">Admin Console</h2>
+            <p class="text-slate-500 font-medium mb-12 h-20 text-lg leading-relaxed">Centralized oversight for student biometric enrollment and faculty directory management.</p>
+            <div class="btn-premium w-full text-center">Open Console →</div>
         </a>
 
-        <!-- Teacher Access (Crimson Theme) -->
-        <a href="{{ url_for('auth.login', role='teacher') }}" class="premium-card group border-red-500/10 hover:border-red-500/40 relative">
-            <div class="absolute -top-24 -right-24 w-48 h-48 bg-red-600/10 blur-3xl rounded-full group-hover:bg-red-600/20 transition-all"></div>
-            <div class="text-5xl mb-8 group-hover:scale-110 transition-transform origin-left">🎓</div>
-            <h2 class="text-4xl font-extrabold text-white mb-4 group-hover:text-red-500 transition-colors">Faculty Portal</h2>
-            <p class="text-gray-400 font-medium mb-12 h-20 text-lg leading-relaxed">High-performance AI face-marking for institutional lecture sessions.</p>
-            <div class="btn-premium w-full text-center">Begin Session →</div>
+        <!-- Teacher Access -->
+        <a href="{{ url_for('auth.login', role='teacher') }}" class="premium-card group border-orange-50 hover:bg-orange-50/50">
+            <div class="text-5xl mb-8">🎓</div>
+            <h2 class="text-4xl font-black text-slate-800 mb-4 group-hover:text-orange-500 transition-colors">Faculty Portal</h2>
+            <p class="text-slate-500 font-medium mb-12 h-20 text-lg leading-relaxed">High-performance AI face-marking for institutional lecture sessions.</p>
+            <div class="btn-premium w-full text-center bg-gradient-to-br from-orange-400 to-red-500 shadow-orange-200">Start Session →</div>
         </a>
 
-        <!-- Student Access (Crimson Theme) -->
-        <a href="{{ url_for('auth.login', role='student') }}" class="premium-card group border-red-500/10 hover:border-red-500/40 relative">
-            <div class="absolute -top-24 -right-24 w-48 h-48 bg-red-600/10 blur-3xl rounded-full group-hover:bg-red-600/20 transition-all"></div>
-            <div class="text-5xl mb-8 group-hover:scale-110 transition-transform origin-left">📖</div>
-            <h2 class="text-4xl font-extrabold text-white mb-4 group-hover:text-red-500 transition-colors">Student Log</h2>
-            <p class="text-gray-400 font-medium mb-12 h-20 text-lg leading-relaxed">Personal verification records and real-time attendance compliance monitoring.</p>
-            <div class="btn-premium w-full text-center">Check Status →</div>
+        <!-- Student Access -->
+        <a href="{{ url_for('auth.login', role='student') }}" class="premium-card group border-emerald-50 hover:bg-emerald-50/50">
+            <div class="text-5xl mb-8">📖</div>
+            <h2 class="text-4xl font-black text-slate-800 mb-4 group-hover:text-emerald-500 transition-colors">Student Log</h2>
+            <p class="text-slate-500 font-medium mb-12 h-20 text-lg leading-relaxed">Personal verification records and real-time attendance compliance monitoring.</p>
+            <div class="btn-premium w-full text-center bg-gradient-to-br from-emerald-400 to-teal-500 shadow-emerald-200">View Log →</div>
         </a>
     </div>
 
     <div class="mt-40 text-center">
-        <p class="text-[10px] font-black text-amber-500/40 uppercase tracking-[0.6em]">Biometric Verification Gateway | Est. 1963</p>
+        <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.8em] animate-pulse">Select Your Portal To Begin Verification</p>
     </div>
 </div>
 {% endblock %}

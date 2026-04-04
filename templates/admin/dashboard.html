@@ -3,52 +3,52 @@
 <div class="py-12 animate-fade">
     <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
         <div>
-            <h1 class="text-6xl font-bold tracking-tighter text-white mb-2">Central Console</h1>
-            <p class="text-gray-400 font-medium">Strategic view of NIT Kurukshetra's academic biometrics.</p>
+            <h1 class="text-6xl font-black tracking-tighter text-slate-800 mb-2">Central Console</h1>
+            <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Strategic view of NIT Kurukshetra's academic biometrics.</p>
         </div>
     </div>
 
     <!-- Metrics Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
-        <div class="premium-card p-10 border-indigo-500/10">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Students</p>
-            <h2 class="text-5xl font-black text-indigo-400">{{ sc }}</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16">
+        <div class="premium-card p-10 border-pink-100">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Total Students</p>
+            <h2 class="text-6xl font-black text-pink-500">{{ sc }}</h2>
         </div>
-        <div class="premium-card p-10 border-emerald-500/10">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Faculty</p>
-            <h2 class="text-5xl font-black text-emerald-400">{{ tc }}</h2>
+        <div class="premium-card p-10 border-emerald-100">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Active Faculty</p>
+            <h2 class="text-6xl font-black text-emerald-500">{{ tc }}</h2>
         </div>
-        <div class="premium-card p-10 border-rose-500/10">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Classes</p>
-            <h2 class="text-5xl font-black text-rose-400">{{ cc }}</h2>
+        <div class="premium-card p-10 border-amber-100">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Total Classes</p>
+            <h2 class="text-6xl font-black text-amber-500">{{ cc }}</h2>
         </div>
-        <div class="premium-card p-10 border-white/5 bg-white/5">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Server Status</p>
+        <div class="premium-card p-10 border-slate-100 bg-slate-50">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Cloud Status</p>
             <div class="flex items-center gap-3">
                 <span class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                <h2 class="text-2xl font-black text-white">Active</h2>
+                <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tighter">Verified</h2>
             </div>
         </div>
     </div>
 
     <!-- Quick Access Hub -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="premium-card border-none bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 group">
-            <h3 class="text-3xl font-bold mb-4">Enrollments</h3>
-            <p class="text-gray-400 mb-10 font-medium h-20">Capture new student biometrics and manage student profiles.</p>
-            <a href="{{ url_for('admin.manage_students') }}" class="btn-premium w-full">Manage Students</a>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div class="premium-card border-none bg-pink-50 group">
+            <h3 class="text-3xl font-black text-slate-800 mb-4 tracking-tighter">Enrollments</h3>
+            <p class="text-slate-500 mb-10 font-medium h-24 leading-relaxed">Capture new student biometrics and manage student profiles for academic tracking.</p>
+            <a href="{{ url_for('admin.manage_students') }}" class="btn-premium w-full shadow-pink-200">Manage Students</a>
         </div>
 
-        <div class="premium-card border-none bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 group">
-            <h3 class="text-3xl font-bold mb-4">Staff Directory</h3>
-            <p class="text-gray-400 mb-10 font-medium h-20">Register professors and provide portal credentials seamlessly.</p>
-            <a href="{{ url_for('admin.manage_teachers') }}" class="btn-premium w-full bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20">Manage Teachers</a>
+        <div class="premium-card border-none bg-emerald-50 group">
+            <h3 class="text-3xl font-black text-slate-800 mb-4 tracking-tighter">Staff Directory</h3>
+            <p class="text-slate-500 mb-10 font-medium h-24 leading-relaxed">Register professors and provide portal credentials seamlessly across all departments.</p>
+            <a href="{{ url_for('admin.manage_teachers') }}" class="btn-premium w-full bg-emerald-500 hover:bg-emerald-600 shadow-emerald-200">Manage Teachers</a>
         </div>
 
-        <div class="premium-card border-none bg-gradient-to-br from-rose-500/10 to-rose-500/5 group">
-            <h3 class="text-3xl font-bold mb-4">Course Map</h3>
-            <p class="text-gray-400 mb-10 font-medium h-20">Configure classes, subjects, and link faculty mappings.</p>
-            <a href="{{ url_for('admin.manage_classes') }}" class="btn-premium w-full bg-rose-500 hover:bg-rose-600 shadow-rose-500/20">Manage Classes</a>
+        <div class="premium-card border-none bg-amber-50 group">
+            <h3 class="text-3xl font-black text-slate-800 mb-4 tracking-tighter">Academic Map</h3>
+            <p class="text-slate-500 mb-10 font-medium h-24 leading-relaxed">Configure classes, subjects, and link faculty mappings for semester goals.</p>
+            <a href="{{ url_for('admin.manage_classes') }}" class="btn-premium w-full bg-amber-500 hover:bg-amber-600 shadow-amber-200">Manage Classes</a>
         </div>
     </div>
 </div>

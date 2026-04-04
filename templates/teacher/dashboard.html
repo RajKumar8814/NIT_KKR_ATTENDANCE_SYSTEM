@@ -3,43 +3,43 @@
 <div class="py-12 animate-fade">
     <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
         <div>
-            <h1 class="text-6xl font-bold tracking-tighter text-white mb-2">Faculty Dashboard</h1>
-            <p class="text-gray-400 font-medium font-inter uppercase tracking-widest text-[10px]">Welcome, Professor <span class="text-indigo-400 font-black">{{ teacher.name }}</span> | NIT Kurukshetra</p>
+            <h1 class="text-6xl font-black tracking-tighter text-slate-800 mb-2">Faculty Dashboard</h1>
+            <p class="text-slate-500 font-black uppercase tracking-widest text-[10px]">Welcome, Professor <span class="text-pink-500 font-extrabold">{{ teacher.name }}</span> | NIT Kurukshetra</p>
         </div>
         <div class="flex gap-4">
-            <a href="{{ url_for('teacher.reports') }}" class="btn-premium bg-white/5 border border-white/10 hover:bg-white/10 uppercase tracking-widest text-xs h-14">View History</a>
-            <a href="{{ url_for('teacher.setup_attendance') }}" class="btn-premium uppercase tracking-widest h-14">Take Attendance</a>
+            <a href="{{ url_for('teacher.reports') }}" class="btn-premium bg-slate-100/50 border border-slate-200 text-slate-700 hover:bg-slate-200/50 uppercase tracking-widest text-[10px] h-14 flex items-center justify-center px-8">View History</a>
+            <a href="{{ url_for('teacher.setup_attendance') }}" class="btn-premium uppercase tracking-widest text-[10px] h-14 flex items-center justify-center px-8">Take Attendance</a>
         </div>
     </div>
 
     <!-- Active Subjects -->
-    <h3 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-8 border-b border-white/5 pb-2">Assigned Subject Load</h3>
+    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 border-b border-slate-100 pb-2">Academic Assignments</h3>
     
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
         {% if subjects %}
             {% for sub in subjects %}
-            <div class="premium-card p-10 flex flex-col justify-between group">
-                <div class="flex items-start justify-between mb-8">
+            <div class="premium-card p-10 flex flex-col justify-between group border-pink-50 hover:bg-pink-50/10">
+                <div class="flex items-start justify-between mb-8 text-left">
                     <div>
-                        <h4 class="text-3xl font-bold text-white mb-2 leading-tight group-hover:text-indigo-400 transition-colors">{{ sub.name }}</h4>
-                        <p class="text-xs font-black text-gray-500 uppercase tracking-widest">{{ sub.class_name }}</p>
+                        <h4 class="text-3xl font-black text-slate-800 mb-2 leading-tight group-hover:text-pink-500 transition-colors">{{ sub.name }}</h4>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ sub.class_name }}</p>
                     </div>
                 </div>
 
-                <div class="pt-8 border-t border-white/5 flex items-center justify-between">
+                <div class="pt-8 border-t border-slate-100 flex items-center justify-between">
                     <div class="text-left">
-                        <p class="text-xs font-black text-gray-500 uppercase tracking-widest mb-1">Sessions Held</p>
-                        <p class="text-4xl font-black text-white">{{ sub.total_lectures }}<span class="text-xs text-gray-600 ml-1">/ 34</span></p>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Sessions Held</p>
+                        <p class="text-4xl font-black text-slate-800">{{ sub.total_lectures }}<span class="text-xs text-slate-300 ml-1">/ 34</span></p>
                     </div>
-                    <a href="{{ url_for('teacher.setup_attendance') }}" class="h-14 w-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-400 hover:bg-indigo-500 hover:text-white transition-all transform hover:rotate-12">
+                    <a href="{{ url_for('teacher.setup_attendance') }}" class="h-14 w-14 bg-pink-500/10 rounded-2xl flex items-center justify-center text-pink-500 hover:bg-pink-500 hover:text-white transition-all transform hover:rotate-12">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                     </a>
                 </div>
             </div>
             {% endfor %}
         {% else %}
-            <div class="col-span-full py-32 text-center premium-card bg-transparent border-dashed border-white/5">
-                <p class="text-xs font-black text-gray-600 uppercase tracking-widest animate-pulse">No academic assignments found</p>
+            <div class="col-span-full py-32 text-center premium-card border-dashed border-slate-200">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse">Waiting for course mapping assignments...</p>
             </div>
         {% endif %}
     </div>

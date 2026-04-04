@@ -58,10 +58,14 @@ def setup_attendance():
         db_encodings = {s["roll_no"]: s.get("encodings", []) for s in students}
             
         # Run ML Inference (InsightFace ONNX Backend)
-        # Using tolerance=1.0 for normalized SCRFD vectors
+        # Adaptive scanning returns (results, error_msg)
         img_bytes = group_photo.read()
-        identified_rolls = match_faces_in_group(img_bytes, db_encodings, tolerance=0.95)
+        identified_rolls, error_msg = match_faces_in_group(img_bytes, db_encodings, tolerance=0.95)
         
+        if error_msg:
+            flash(f"Vision Engine Notice: {error_msg}", "error")
+            return redirect(request.url)
+            
         del img_bytes
         del students
         del db_encodings

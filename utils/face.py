@@ -18,7 +18,7 @@ except Exception as e:
     print(f"CRITICAL: Failed to load InsightFace Model on boot: {e}")
     face_app = None
 
-def check_ram_usage(max_percent=85.0):
+def check_ram_usage(max_percent=90.0):
     """
     Safely checks Linux memory profile to prevent OOM (Out Of Memory) crashes.
     """
@@ -34,10 +34,11 @@ def check_ram_usage(max_percent=85.0):
         # Non-linux environment check bypass
         return True, 0.0
 
-def get_optimized_tensor(image_bytes, target_dim=640):
+def get_optimized_tensor(image_bytes, target_dim=1600):
     """
     Resizes image bytes to an optimized tensor format using OpenCV-direct decoding.
     Crucial for handling various JPEG metadata formats that PIL sometimes skips.
+    High resolution (1600px) allows for detecting faces in the 4th/5th rows.
     """
     try:
         # Direct decode from memory buffer to OpenCV BGR format (fastest)
@@ -45,19 +46,17 @@ def get_optimized_tensor(image_bytes, target_dim=640):
         img_cv2 = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
         if img_cv2 is None:
-            print("ERROR: OpenCV failed to decode image bytes.")
-            return None
+            return None, "OpenCV failed to decode image bytes."
 
-        # Scale protection: Downscale large photos to 640px to ensure CPU-bound speed
+        # Scale protection: Downscale large photos to 1600px to ensure CPU-bound speed
         h, w = img_cv2.shape[:2]
         if max(h, w) > target_dim:
             scale = target_dim / max(h, w)
             img_cv2 = cv2.resize(img_cv2, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
 
-        return img_cv2
+        return img_cv2, None
     except Exception as e:
-        print(f"DEBUG: Tensor conversion failed: {e}")
-        return None
+        return None, str(e)
 
 def extract_face_encodings(image_bytes):
     """
@@ -73,9 +72,9 @@ def extract_face_encodings(image_bytes):
         return []
 
     try:
-        img_tensor = get_optimized_tensor(image_bytes)
+        img_tensor, err = get_optimized_tensor(image_bytes, target_dim=640) # Enrollment uses smaller dim for speed
         if img_tensor is None: 
-            print("ERROR: Failed to convert image bytes to tensor for encoding.")
+            print(f"ERROR: {err}")
             return []
 
         # Run Face Discovery + Recognition
@@ -95,27 +94,31 @@ def extract_face_encodings(image_bytes):
 def match_faces_in_group(group_image_bytes, known_encodings_dict, tolerance=1.0):
     """
     Matches faces in a group photo against the database list of encodings.
-    Uses pure NumPy distance calculations which is much faster than standard loops.
+    Now updated for Adaptive High-Density Scanning (1600px, 0.4 Thresh).
+    Returns (list_of_rolls, error_message)
     """
     if not face_app: 
-        print("ERROR: Face App not initialized. Cannot perform matching.")
-        return []
+        return [], "AI Engine not initialized correctly on boot."
 
     # CPU/RAM Check
     ok, ram_p = check_ram_usage()
     if not ok: 
-        print(f"ERROR: RAM usage too high ({ram_p:.1f}%) for matching.")
-        return []
+        return [], f"Memory Limit (RAM: {ram_p:.1f}%) is too high to run AI scanning safely."
 
     try:
-        img_tensor = get_optimized_tensor(group_image_bytes)
+        # Increase scan resolution for back-row faces (target_dim=1600)
+        img_tensor, err = get_optimized_tensor(group_image_bytes, target_dim=1600)
         if img_tensor is None: 
-            print("ERROR: Failed to convert group photo to tensor.")
-            return []
+            return [], f"Photo Decode Error: {err}"
 
-        # Parse group photo for all faces
-        faces = face_app.get(img_tensor)
-        print(f"DEBUG: Detected {len(faces)} faces in group photo.")
+        # Lower det_thresh to 0.4 for improved scanning of back rows and occlusions
+        # Wrapped in extra try to catch specific AI core timeouts
+        try:
+            faces = face_app.get(img_tensor, det_thresh=0.4)
+        except Exception as ai_err:
+            return [], f"AI Detection Failed: {ai_err}. (Tip: Try a smaller photo)"
+
+        print(f"DEBUG: Scanned {len(faces)} faces at high density.")
         
         del img_tensor
         gc.collect()
@@ -145,15 +148,14 @@ def match_faces_in_group(group_image_bytes, known_encodings_dict, tolerance=1.0)
                         if dist < tolerance and dist < min_dist:
                             min_dist = dist
                             best_match_roll = roll_no
-                    except Exception as shape_err:
-                        # Skip incompatible vectors silently to prevent system crash
+                    except:
                         continue
                         
             if best_match_roll:
                 identified_rolls.add(best_match_roll)
 
-        print(f"DEBUG: Identified {len(identified_rolls)} students: {list(identified_rolls)}")
-        return list(identified_rolls)
-    except Exception as e:
-        print(f"Group matching error: {e}")
-        return []
+        print(f"DEBUG: Identified {len(identified_rolls)} students matches.")
+        return list(identified_rolls), None
+
+    except Exception as general_err:
+        return [], f"System Overhead Warning: {general_err}"
