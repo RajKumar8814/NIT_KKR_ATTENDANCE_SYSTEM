@@ -9,6 +9,7 @@ gunicorn
 uvicorn
 python-dotenv
 pymongo[srv]
+Flask-PyMongo
 numpy==1.26.4
 scipy
 dnspython
