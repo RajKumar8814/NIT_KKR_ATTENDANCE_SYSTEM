@@ -72,10 +72,13 @@ def extract_face_encodings(image_bytes):
 
     try:
         img_tensor = get_optimized_tensor(image_bytes)
-        if img_tensor is None: return []
+        if img_tensor is None: 
+            print("ERROR: Failed to convert image bytes to tensor for encoding.")
+            return []
 
         # Run Face Discovery + Recognition
         faces = face_app.get(img_tensor)
+        print(f"DEBUG: Found {len(faces)} faces in enrollment photo.")
         
         del img_tensor
         gc.collect()
@@ -92,18 +95,26 @@ def match_faces_in_group(group_image_bytes, known_encodings_dict, tolerance=1.0)
     Matches faces in a group photo against the database list of encodings.
     Uses pure NumPy distance calculations which is much faster than standard loops.
     """
-    if not face_app: return []
+    if not face_app: 
+        print("ERROR: Face App not initialized. Cannot perform matching.")
+        return []
 
     # CPU/RAM Check
     ok, ram_p = check_ram_usage()
-    if not ok: return []
+    if not ok: 
+        print(f"ERROR: RAM usage too high ({ram_p:.1f}%) for matching.")
+        return []
 
     try:
         img_tensor = get_optimized_tensor(group_image_bytes)
-        if img_tensor is None: return []
+        if img_tensor is None: 
+            print("ERROR: Failed to convert group photo to tensor.")
+            return []
 
         # Parse group photo for all faces
         faces = face_app.get(img_tensor)
+        print(f"DEBUG: Detected {len(faces)} faces in group photo.")
+        
         del img_tensor
         gc.collect()
 
@@ -139,6 +150,7 @@ def match_faces_in_group(group_image_bytes, known_encodings_dict, tolerance=1.0)
             if best_match_roll:
                 identified_rolls.add(best_match_roll)
 
+        print(f"DEBUG: Identified {len(identified_rolls)} students: {list(identified_rolls)}")
         return list(identified_rolls)
     except Exception as e:
         print(f"Group matching error: {e}")

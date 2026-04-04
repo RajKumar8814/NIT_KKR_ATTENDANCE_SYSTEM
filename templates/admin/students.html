@@ -79,11 +79,12 @@
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Initial Biometric Profile (Max 5 Image Files)</label>
                     <div class="relative group cursor-pointer border-2 border-dashed border-white/10 rounded-3xl p-10 bg-white/1 hover:bg-white/5 transition-all text-center">
-                        <div class="space-y-4">
+                        <div class="space-y-4" id="upload-box-content">
                             <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">Drop files or click to upload</p>
                             <p class="text-gray-600 text-xs font-bold uppercase tracking-widest">Up to 5 images for maximum accuracy</p>
                         </div>
-                        <input type="file" name="photos" class="absolute inset-0 opacity-0 cursor-pointer" multiple accept="image/*" required>
+                        <input type="file" name="photos" id="photo-input" class="absolute inset-0 opacity-0 cursor-pointer" multiple accept="image/*" required
+                               onchange="updateFileLabel(this)">
                     </div>
                 </div>
 
@@ -95,4 +96,25 @@
         </div>
     </div>
 </div>
+
+<script>
+function updateFileLabel(input) {
+    const content = document.getElementById('upload-box-content');
+    if (input.files.length > 0) {
+        content.innerHTML = `
+            <p class="text-emerald-400 font-black text-sm uppercase tracking-widest leading-relaxed">
+                ✓ ${input.files.length} Photos Selected
+            </p>
+            <p class="text-gray-500 text-[10px] uppercase font-bold tracking-tighter">
+                ${Array.from(input.files).map(f => f.name).join(', ').substring(0, 50)}...
+            </p>
+        `;
+    } else {
+        content.innerHTML = `
+            <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">Drop files or click to upload</p>
+            <p class="text-gray-600 text-xs font-bold uppercase tracking-widest">Up to 5 images for maximum accuracy</p>
+        `;
+    }
+}
+</script>
 {% endblock %}

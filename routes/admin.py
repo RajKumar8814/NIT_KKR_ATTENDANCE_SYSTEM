@@ -124,7 +124,9 @@ def manage_students():
         encodings = []
         image_urls = []
         
-        for file in photos[:5]:
+        print(f"INFO: Processing enrollment for {name} ({roll_no}) with {len(photos)} photos.")
+        
+        for i, file in enumerate(photos[:5]):
             if file and file.filename != '':
                 image_bytes = file.read()
                 try:
@@ -132,16 +134,25 @@ def manage_students():
                     encs = extract_face_encodings(image_bytes)
                     if encs:
                         encodings.append(encs[0])
+                        print(f"DEBUG: Photo {i+1} - Face detected and encoded.")
+                        
                         # Cloudinary Proof Storage
-                        upload_res = cloudinary.uploader.upload(io.BytesIO(image_bytes), folder=f"attendance/students/{roll_no}")
-                        image_urls.append(upload_res.get("secure_url"))
+                        try:
+                            upload_res = cloudinary.uploader.upload(io.BytesIO(image_bytes), folder=f"attendance/students/{roll_no}")
+                            image_urls.append(upload_res.get("secure_url"))
+                            print(f"DEBUG: Photo {i+1} - Uploaded to Cloudinary.")
+                        except Exception as cloud_err:
+                            print(f"ERROR: Cloudinary Upload Failed for photo {i+1}: {cloud_err}")
+                    else:
+                        print(f"WARNING: Photo {i+1} - No face detected.")
                 except Exception as e:
-                    print(f"Cloud Storage Error: {e}")
+                    print(f"ERROR: Processing photo {i+1} failed: {e}")
                 finally:
                     del image_bytes
                     gc.collect()
         
         if not encodings:
+            print(f"ERROR: Enrollment failed for {roll_no}. Zero face encodings captured from {len(photos)} photos.")
             flash("Failed to capture any face embeddings. Use clearer photos.", "error")
             return redirect(url_for("admin.manage_students"))
             
