@@ -7,10 +7,10 @@ ENV PYTHONUNBUFFERED=1
 ENV PORT=8080
 
 # Install minimal Linux system dependencies for OpenCV and Face Analysis
-# We use libgl1-mesa-glx for the smallest footprint that supports libGL.so.1
+# libgl1 is the standard requirement for libGL.so.1 in modern Debian-slim images
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
