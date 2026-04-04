@@ -163,12 +163,13 @@ def manage_students():
         for i, file in enumerate(photos[:5]):
             if file and file.filename != '':
                 image_bytes = file.read()
+                print(f"DEBUG: Photo {i+1} received. Size: {len(image_bytes)} bytes.")
                 try:
                     # ML Extraction (InsightFace SCRFD)
                     encs = extract_face_encodings(image_bytes)
                     if encs:
                         encodings.append(encs[0])
-                        print(f"DEBUG: Photo {i+1} - Face detected and encoded.")
+                        print(f"DEBUG: Photo {i+1} - Face detected and encoded. (Current Total: {len(encodings)})")
                         
                         # Cloudinary Proof Storage
                         try:

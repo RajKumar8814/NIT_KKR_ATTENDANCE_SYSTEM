@@ -36,25 +36,27 @@ def check_ram_usage(max_percent=85.0):
 
 def get_optimized_tensor(image_bytes, target_dim=640):
     """
-    Resizes image bytes to an optimized tensor format skipping buffer overhead.
+    Resizes image bytes to an optimized tensor format using OpenCV-direct decoding.
+    Crucial for handling various JPEG metadata formats that PIL sometimes skips.
     """
     try:
-        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-        img_np = np.array(image)
-        # BGR conversion for InsightFace
-        img_cv2 = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
+        # Direct decode from memory buffer to OpenCV BGR format (fastest)
+        nparr = np.frombuffer(image_bytes, np.uint8)
+        img_cv2 = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
-        # Scale protection: Downscale large group photos to 640px to ensure CPU-bound speed
+        if img_cv2 is None:
+            print("ERROR: OpenCV failed to decode image bytes.")
+            return None
+
+        # Scale protection: Downscale large photos to 640px to ensure CPU-bound speed
         h, w = img_cv2.shape[:2]
         if max(h, w) > target_dim:
             scale = target_dim / max(h, w)
             img_cv2 = cv2.resize(img_cv2, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
 
-        del image
-        del img_np
-        gc.collect()
         return img_cv2
-    except:
+    except Exception as e:
+        print(f"DEBUG: Tensor conversion failed: {e}")
         return None
 
 def extract_face_encodings(image_bytes):
