@@ -1,7 +1,7 @@
 import os
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import json
+import urllib.request
+import urllib.error
 from functools import wraps
 from flask import session, redirect, url_for, flash
 
@@ -28,46 +28,68 @@ def get_user_role(email, db):
 
 def send_otp_email(user_email, otp):
     """
-    Sends 6-digit OTP using Gmail SMTP with strict TLS/SSL support.
+    Sends 6-digit OTP using Brevo (Sendinblue) Web API v3.
+    Bypasses Port 465/587 blocks on Railway by using Port 443 (HTTPS).
     """
-    mail_user = os.getenv("MAIL_USER")
-    mail_pass = os.getenv("MAIL_PASS")
+    api_key = os.getenv("BREVO_API_KEY")
+    sender_email = os.getenv("MAIL_USER", "raj05062005@gmail.com") 
+    
+    if not api_key:
+        # Check if they are still using the old SENDGRID_API_KEY by mistake
+        api_key = os.getenv("SENDGRID_API_KEY")
+        if not api_key:
+            print(f"CRITICAL: BREVO_API_KEY not found in Railway Variables.")
+            print(f"========== [FALLBACK] OTP FOR {user_email}: {otp} ==========")
+            return False, "Email Service API Key Missing"
 
-    # Deep clean formatting incase the App Password was copied with whitespace spaces
-    if mail_pass:
-        mail_pass = mail_pass.replace(" ", "").strip()
-        
-    if not mail_user or not mail_pass:
-        print(f"========== DEBUG OTP: {otp} for {user_email} ==========")
-        return True, "MAIL_PASS not configured"
+    # Brevo V3 API Endpoint
+    url = "https://api.brevo.com/v3/smtp/email"
+    
+    # Payload for Brevo API
+    payload = {
+        "sender": {"name": "NIT KKR Attendance", "email": sender_email},
+        "to": [{"email": user_email}],
+        "subject": "Institutional Verification: OTP Code",
+        "htmlContent": f"""
+            <html>
+                <body style="font-family: Arial, sans-serif; color: #333;">
+                    <h2 style="color: #b91c1c;">NIT Kurukshetra Smart Attendance</h2>
+                    <p>Your one-time password (OTP) for system access is:</p>
+                    <div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #d946ef; margin: 20px 0;">
+                        {otp}
+                    </div>
+                    <p>This code is valid for 5 minutes.</p>
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                    <p style="font-size: 10px; color: #999; text-transform: uppercase;">Biometric Security Gateway | National Institute of Technology</p>
+                </body>
+            </html>
+        """
+    }
+
+    headers = {
+        "api-key": api_key,
+        "content-type": "application/json",
+        "accept": "application/json"
+    }
 
     try:
-        msg = MIMEMultipart()
-        msg['From'] = mail_user
-        msg['To'] = user_email
-        msg['Subject'] = "NIT KKR Attendance System OTP"
-
-        # Premium Branded Email Body
-        body = f"Hello User,\n\nYour one-time password (OTP) for the NIT Kurukshetra Smart Attendance System is: {otp}\n\nThis code is valid for 5 minutes. If you did not request this, please ignore this email.\n\nInstitutional Biometric Portal"
-        msg.attach(MIMEText(body, 'plain'))
-
-        # Modern Gmail SMTP Port 465 with SSL (Extremely stable for Railway/Cloud)
-        # Note: Gmail REJECTS normal passwords. You MUST use a 16-character 'App Password'.
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=15)
-        server.login(mail_user, mail_pass)
-        server.send_message(msg)
-        server.quit()
-        return True, "Success"
-    except smtplib.SMTPAuthenticationError:
-        err_msg = "Gmail Authentication Failed: Use an 'App Password', not your normal password."
-        print(f"CRITICAL AUTH ERROR: {err_msg}")
+        req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), headers=headers, method='POST')
+        with urllib.request.urlopen(req, timeout=15) as response:
+            if response.status in [200, 201, 202]:
+                print(f"SUCCESS: OTP Delivered via Brevo API to {user_email}")
+                return True, "Success"
+            else:
+                raise Exception(f"Brevo API error: Status {response.status}")
+                
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode('utf-8')
+        print(f"FAILED TO SEND EMAIL (Brevo API): {e.code} - {err_body}")
         print(f"========== [FALLBACK] OTP FOR {user_email}: {otp} ==========")
-        return False, err_msg
+        return False, f"Brevo API Error: {e.code}"
     except Exception as e:
-        err_msg = f"Network/SMTP Error: {str(e)}"
-        print(f"FAILED TO SEND EMAIL: {err_msg}")
+        print(f"SYSTEM OVERHEAD/TIMEOUT (Brevo): {str(e)}")
         print(f"========== [FALLBACK] OTP FOR {user_email}: {otp} ==========")
-        return False, err_msg
+        return False, "Network Timeout"
 
 # Flask Middleware Decorators
 def login_required(f):
