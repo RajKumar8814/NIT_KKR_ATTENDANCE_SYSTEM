@@ -1,48 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="relative overflow-hidden pt-32 pb-64 animate-fade">
-    <div class="lg:mx-auto lg:grid lg:max-w-7xl lg:grid-cols-2 lg:items-center lg:gap-24">
-        <div class="px-6 lg:px-0">
-            <h1 class="text-7xl font-bold tracking-tighter text-white mb-8">Smart <br> Attendance <br> <span class="text-indigo-500">System</span></h1>
-            <p class="text-xl text-gray-400 font-medium mb-12 max-w-lg">NIT Kurukshetra's advanced biometric attendance platform. Secure, efficient, and AI-driven management for modern academia.</p>
-            
-            <div class="flex gap-4">
-                <a href="{{ url_for('auth.login', role='student') }}" class="btn-premium">Student Portal</a>
-                <a href="{{ url_for('auth.login', role='teacher') }}" class="btn-premium bg-white/5 border border-white/10 hover:bg-white/10">Teacher Portal</a>
-            </div>
-        </div>
+<div class="py-24 animate-fade">
+    <div class="text-center mb-24 max-w-4xl mx-auto">
+        <h1 class="text-8xl font-black tracking-tighter text-white mb-6 leading-none">Attendance <br> Systems</h1>
+        <p class="text-xl font-bold text-amber-500/80 uppercase tracking-[0.4em] font-heading">National Institute of Technology Kurukshetra</p>
+    </div>
 
-        <div class="mt-16 lg:mt-0 grid grid-cols-1 gap-6">
-            <div class="premium-card p-12 flex items-center justify-between group">
-                <div>
-                    <h3 class="text-2xl font-bold mb-2">Faculty Access</h3>
-                    <p class="text-gray-400 font-medium">Manage students, capture attendance, and monitor statistics.</p>
-                </div>
-                <a href="{{ url_for('auth.login', role='teacher') }}" class="h-14 w-14 bg-indigo-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                </a>
-            </div>
+    <!-- NIT KKR Brand Entrance Portals -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-7xl mx-auto px-6">
+        <!-- Admin Access (Crimson Theme) -->
+        <a href="{{ url_for('auth.login', role='admin') }}" class="premium-card group border-red-500/10 hover:border-red-500/40 relative">
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-red-600/10 blur-3xl rounded-full group-hover:bg-red-600/20 transition-all"></div>
+            <div class="text-5xl mb-8 group-hover:scale-110 transition-transform origin-left">🛡️</div>
+            <h2 class="text-4xl font-extrabold text-white mb-4 group-hover:text-red-500 transition-colors">Admin Console</h2>
+            <p class="text-gray-400 font-medium mb-12 h-20 text-lg leading-relaxed">Centralized oversight for student biometric enrollment and faculty directory management.</p>
+            <div class="btn-premium w-full text-center">Open Dashboard →</div>
+        </a>
 
-            <div class="premium-card p-12 flex items-center justify-between group">
-                <div>
-                    <h3 class="text-2xl font-bold mb-2">Student Insights</h3>
-                    <p class="text-gray-400 font-medium">View your history, attendance percentage, and academic goals.</p>
-                </div>
-                <a href="{{ url_for('auth.login', role='student') }}" class="h-14 w-14 bg-emerald-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </a>
-            </div>
+        <!-- Teacher Access (Crimson Theme) -->
+        <a href="{{ url_for('auth.login', role='teacher') }}" class="premium-card group border-red-500/10 hover:border-red-500/40 relative">
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-red-600/10 blur-3xl rounded-full group-hover:bg-red-600/20 transition-all"></div>
+            <div class="text-5xl mb-8 group-hover:scale-110 transition-transform origin-left">🎓</div>
+            <h2 class="text-4xl font-extrabold text-white mb-4 group-hover:text-red-500 transition-colors">Faculty Portal</h2>
+            <p class="text-gray-400 font-medium mb-12 h-20 text-lg leading-relaxed">High-performance AI face-marking for institutional lecture sessions.</p>
+            <div class="btn-premium w-full text-center">Begin Session →</div>
+        </a>
 
-            <div class="premium-card p-12 flex items-center justify-between group border-rose-500/10">
-                <div>
-                    <h3 class="text-2xl font-bold mb-2">System Admin</h3>
-                    <p class="text-gray-400 font-medium">Configure institution-wide settings and manage users.</p>
-                </div>
-                <a href="{{ url_for('auth.login', role='admin') }}" class="h-14 w-14 bg-rose-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                </a>
-            </div>
-        </div>
+        <!-- Student Access (Crimson Theme) -->
+        <a href="{{ url_for('auth.login', role='student') }}" class="premium-card group border-red-500/10 hover:border-red-500/40 relative">
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-red-600/10 blur-3xl rounded-full group-hover:bg-red-600/20 transition-all"></div>
+            <div class="text-5xl mb-8 group-hover:scale-110 transition-transform origin-left">📖</div>
+            <h2 class="text-4xl font-extrabold text-white mb-4 group-hover:text-red-500 transition-colors">Student Log</h2>
+            <p class="text-gray-400 font-medium mb-12 h-20 text-lg leading-relaxed">Personal verification records and real-time attendance compliance monitoring.</p>
+            <div class="btn-premium w-full text-center">Check Status →</div>
+        </a>
+    </div>
+
+    <div class="mt-40 text-center">
+        <p class="text-[10px] font-black text-amber-500/40 uppercase tracking-[0.6em]">Biometric Verification Gateway | Est. 1963</p>
     </div>
 </div>
 {% endblock %}

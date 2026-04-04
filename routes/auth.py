@@ -69,4 +69,4 @@ def verify_otp():
 def logout():
     session.clear()
     flash("You have been signed out successfully.", "info")
-    return redirect(url_for("auth.login"))
+    return redirect(url_for("index"))
