@@ -6,17 +6,19 @@ from functools import wraps
 from flask import session, redirect, url_for, flash
 
 # Admin configuration explicitly decoupling arrays from raw code directly onto safe scalable Environmental blocks
-ADMIN_EMAILS = [email.strip().lower() for email in os.getenv("ADMIN_EMAILS", "rk844304@gmail.com").split(",") if email.strip()]
-
-def is_valid_domain(email):
-    # Absolute unrestricted entry validation natively unblocked per requirement specs
-    return True
+def get_admins():
+    """
+    Returns the list of admin emails from the ENV variable.
+    """
+    raw_admins = os.getenv("ADMIN_EMAILS", "rk844304@gmail.com,raj05062005@gmail.com")
+    return [email.strip().lower() for email in raw_admins.split(",") if email.strip()]
 
 def get_user_role(email, db):
-    if email in ADMIN_EMAILS:
-        return "admin"
-    admin_user = db.users.find_one({"email": email, "role": "admin"})
-    if admin_user:
+    """
+    Determines user role based on email lookup.
+    """
+    email = email.lower()
+    if email in get_admins():
         return "admin"
     if db.teachers.find_one({"email": email}):
         return "teacher"
@@ -25,6 +27,9 @@ def get_user_role(email, db):
     return None
 
 def send_otp_email(user_email, otp):
+    """
+    Sends 6-digit OTP using Gmail SMTP with strict TLS/SSL support.
+    """
     mail_user = os.getenv("MAIL_USER")
     mail_pass = os.getenv("MAIL_PASS")
 
@@ -40,28 +45,29 @@ def send_otp_email(user_email, otp):
         msg = MIMEMultipart()
         msg['From'] = mail_user
         msg['To'] = user_email
-        msg['Subject'] = "Smart Attendance OTP Login"
+        msg['Subject'] = "Attendance System Login OTP"
 
         body = f"Your one-time password (OTP) is: {otp}\nIt is valid for 5 minutes."
         msg.attach(MIMEText(body, 'plain'))
 
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=15)
+        # Use SSL on port 465 for modern Gmail security
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=20)
         server.login(mail_user, mail_pass)
         server.send_message(msg)
         server.quit()
         return True, "Success"
     except Exception as e:
-        print(f"Failed to send email: {e}")
-        # Even if sending fails, print it out so debugging is easy
-        print(f"========== DEBUG OTP (Send Failed): {otp} for {user_email} ==========")
+        print(f"FAILED TO SEND EMAIL: {e}")
+        # Always print for logs in case of failure
+        print(f"========== DEBUG OTP (Send Failure): {otp} for {user_email} ==========")
         return False, str(e)
 
-# Decorators
+# Flask Middleware Decorators
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if "user" not in session:
-            flash("Please log in to continue.", "error")
+            flash("Log in required to access this portal.", "info")
             return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -71,10 +77,10 @@ def role_required(role):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             if "user" not in session:
-                flash("Please log in to continue.", "error")
+                flash("Log in required to access this portal.", "info")
                 return redirect(url_for('auth.login'))
             if session.get("role") != role:
-                flash(f"Unauthorized. Requires {role} privileges.", "error")
+                flash(f"Access Denied. You require {role.capitalize()} privileges.", "error")
                 return redirect(url_for('auth.login'))
             return f(*args, **kwargs)
         return decorated_function

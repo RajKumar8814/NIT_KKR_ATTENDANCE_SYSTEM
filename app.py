@@ -2,27 +2,24 @@ import os
 import gc
 from flask import Flask, redirect, url_for, session, render_template
 from dotenv import load_dotenv
-from utils.db import init_db, mongo # Import mongo directly here too
+from utils.db import init_db, mongo
 
-# Load environment variables
+# 0. Load environment variables
 load_dotenv()
 
 def create_app():
     app = Flask(__name__)
 
-    # 1. Security & Upload Constraints
-    # 16MB is fine for the request, but remember face.py will resize it to < 1MB
+    # 1. System Configuration
+    # 16MB max upload limit is plenty for 1080p photos
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-    app.secret_key = os.getenv('SECRET_KEY', 'nit-kkr-secure-999-alpha')
+    app.secret_key = os.getenv('SECRET_KEY', 'nit-kkr-secure-2026-v2')
     
-    # 2. Database Configuration
-    # Ensure you set MONGO_URI in Render Dashboard!
+    # 2. MongoDB setup
     app.config["MONGO_URI"] = os.getenv("MONGO_URI")
-    
-    # 3. Initialize DB with the Indexing logic I gave you
     init_db(app)
 
-    # 4. Register Blueprints (Imported inside to prevent circular issues)
+    # 3. Register Blueprints (Imported strictly inside context)
     with app.app_context():
         from routes.auth import auth_bp
         from routes.admin import admin_bp
@@ -34,6 +31,7 @@ def create_app():
         app.register_blueprint(teacher_bp, url_prefix="/teacher")
         app.register_blueprint(student_bp, url_prefix="/student")
 
+    # 4. Universal Navigation
     @app.route("/")
     def index():
         if "user" in session:
@@ -44,31 +42,30 @@ def create_app():
                 return redirect(url_for("teacher.dashboard"))
             elif role == "student":
                 return redirect(url_for("student.dashboard"))
-        # Deliver unified multi-portal selection 
+        
+        # New Landing Page with Portal selection
         return render_template("home.html")
 
-    # Global Error Handlers gracefully intercepting exceptions preventing entire application crash boundaries
+    # 5. Global Error Resiliency
     @app.errorhandler(404)
     def page_not_found(e):
-        error_context = "The page you are looking for does not exist."
-        return render_template("base.html", title="404 Not Found", error_block=error_context), 404
-        
+        return render_template("base.html", title="Not Found", error_block="The page you requested does not exist."), 404
+
     @app.errorhandler(Exception)
     def handle_exception(e):
         import traceback
         import logging
         logging.error(traceback.format_exc())
-        error_context = "An unexpected server operation timed out or failed. Our system successfully caught the error."
-        return render_template("base.html", title="500 Internal Error", error_block=error_context), 500
+        return render_template("base.html", title="System Error", error_block="An internal operation failed. Our profiler has caught the error and saved the system state."), 500
 
-    # Cleanup memory after initialization guaranteeing lightweight footprints natively
+    # Garbage collection after boot to ensure 1GB RAM stays clean
     gc.collect()
     
     return app
 
+# The entry point for Gthreads Gunicorn
 app = create_app()
 
 if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)

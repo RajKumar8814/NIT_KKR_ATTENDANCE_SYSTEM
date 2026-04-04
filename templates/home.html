@@ -1,48 +1,70 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-16">
-        <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
-            Smart Attendance <span class="text-indigo-600">Portals</span>
-        </h1>
-        <p class="text-lg text-gray-500">Select your designated portal to securely access the system.</p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <!-- Student Portal -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-lg transition-shadow duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
-            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <svg class="w-16 h-16 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" fill-rule="evenodd"></path></svg>
+<div class="relative overflow-hidden bg-gray-50 pt-16 pb-32">
+    <div class="relative">
+        <div class="lg:mx-auto lg:grid lg:max-w-7xl lg:grid-cols-2 lg:items-start lg:gap-24 lg:px-8">
+            <div class="relative sm:py-16 lg:py-0">
+                <div aria-hidden="true" class="hidden sm:block lg:absolute lg:inset-y-0 lg:right-0 lg:w-screen">
+                    <div class="absolute inset-y-0 right-1/2 w-full rounded-r-3xl bg-blue-50 lg:right-72"></div>
+                    <svg class="absolute top-8 left-1/2 -ml-3 lg:-right-8 lg:left-auto lg:top-12" width="404" height="392" fill="none" viewBox="0 0 404 392">
+                        <defs><pattern id="02f690e4-8fd1-4df9-86c0-41c0b4c582b8" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" /></pattern></defs>
+                        <rect width="404" height="392" fill="url(#02f690e4-8fd1-4df9-86c0-41c0b4c582b8)" />
+                    </svg>
+                </div>
+                <div class="relative mx-auto max-w-md px-4 sm:max-w-3xl sm:px-6 lg:max-w-none lg:px-0 lg:py-20">
+                    <div class="relative overflow-hidden rounded-2xl pt-64 pb-10 shadow-xl">
+                        <img class="absolute inset-0 h-full w-full object-cover" src="https://images.unsplash.com/photo-1523050853063-bd8012fec0c8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Attendance">
+                        <div class="absolute inset-0 bg-blue-500 mix-blend-multiply"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-blue-600 via-blue-600 opacity-90"></div>
+                        <div class="relative px-8">
+                            <blockquote class="mt-8">
+                                <div class="relative text-lg font-medium text-white md:flex-grow">
+                                    <p class="relative">Welcome to the NIT Kurukshetra Smart Attendance System. Leveraging Biometric AI for seamless academic management.</p>
+                                </div>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <h3 class="text-2xl font-bold text-gray-900 mb-2">Student</h3>
-            <p class="text-gray-500 mb-6 text-sm">View attendance schedules, check metrics, and analyze your performance.</p>
-            <a href="{{ url_for('auth.login', role='student') }}" class="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
-                Enter Student Portal
-            </a>
-        </div>
 
-        <!-- Teacher Portal -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-lg transition-shadow duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
-            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <svg class="w-16 h-16 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-900 mb-2">Teacher</h3>
-            <p class="text-gray-500 mb-6 text-sm">Automate class attendance scans via group profiling intelligently.</p>
-            <a href="{{ url_for('auth.login', role='teacher') }}" class="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-green-700 bg-green-100 border border-transparent rounded-md hover:bg-green-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-500">
-                Enter Teacher Portal
-            </a>
-        </div>
+            <div class="relative mx-auto max-w-md px-4 sm:max-w-3xl sm:px-6 lg:px-0">
+                <div class="pt-12 sm:pt-16 lg:pt-20">
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">One Portal. Three Experiences.</h2>
+                    <div class="mt-10 space-y-8">
+                        <div class="flex flex-col space-y-4">
+                            <a href="{{ url_for('auth.login', role='student') }}" class="group relative flex items-center space-x-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:border-blue-500 hover:ring-1 hover:ring-blue-500 transition-all duration-200">
+                                <div class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-blue-50 group-hover:bg-blue-100">
+                                    <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-900">Student Portal</h3>
+                                    <p class="text-gray-500">Check your attendance stats and 75% goal progress.</p>
+                                </div>
+                            </a>
 
-        <!-- Admin Portal -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-lg transition-shadow duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
-            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <svg class="w-16 h-16 text-purple-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+                            <a href="{{ url_for('auth.login', role='teacher') }}" class="group relative flex items-center space-x-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:border-green-500 hover:ring-1 hover:ring-green-500 transition-all duration-200">
+                                <div class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-green-50 group-hover:bg-green-100">
+                                    <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-900">Teacher Portal</h3>
+                                    <p class="text-gray-500">Scan group photos and automate classroom attendance.</p>
+                                </div>
+                            </a>
+
+                            <a href="{{ url_for('auth.login', role='admin') }}" class="group relative flex items-center space-x-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:border-purple-500 hover:ring-1 hover:ring-purple-500 transition-all duration-200">
+                                <div class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-purple-50 group-hover:bg-purple-100">
+                                    <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-900">Admin Portal</h3>
+                                    <p class="text-gray-500">Manage students, teachers, classes and biometric data.</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <h3 class="text-2xl font-bold text-gray-900 mb-2">Admin</h3>
-            <p class="text-gray-500 mb-6 text-sm">Mange system arrays securely, map permissions, and define scaling routes.</p>
-            <a href="{{ url_for('auth.login', role='admin') }}" class="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-purple-700 bg-purple-100 border border-transparent rounded-md hover:bg-purple-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500">
-                Enter Admin Portal
-            </a>
         </div>
     </div>
 </div>

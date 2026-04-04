@@ -1,26 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-md mt-10 border border-gray-100">
-    <div class="p-8">
-        <div class="uppercase tracking-wide text-sm text-blue-600 font-semibold mb-1">{% if role %}{{ role.capitalize() }} Portal{% else %}Access Portal{% endif %}</div>
-        <h2 class="block mt-1 text-2xl leading-tight font-bold text-gray-900 mb-6">Login to your account</h2>
-        
-        <form method="POST" action="{{ url_for('auth.login') }}">
-            <input type="hidden" name="role" value="{{ role }}">
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
-                    Global Email Address
-                </label>
-                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:blue-500 focus:border-transparent" 
-                       id="email" type="email" name="email" placeholder="example@gmail.com" required>
+<div class="max-w-md mx-auto mt-24 mb-32">
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 h-2"></div>
+        <div class="p-10">
+            <div class="text-center mb-10">
+                <h1 class="text-3xl font-black text-gray-900 mb-2">Welcome Back</h1>
+                <p class="text-gray-500 font-medium">Accessing the {% if role %}{{ role.capitalize() }}{% else %}Identity{% endif %} Portal</p>
             </div>
             
-            <div class="flex items-center justify-between mt-6">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full transition duration-150 ease-in-out" type="submit">
-                    Send OTP
+            <form method="POST" action="{{ url_for('auth.login') }}" class="space-y-6">
+                <!-- Portal Role Context -->
+                <input type="hidden" name="role" value="{{ role }}">
+                
+                <div>
+                    <label for="email" class="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
+                    <div class="relative">
+                        <input class="block w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all placeholder:text-gray-400 font-medium" 
+                               id="email" type="email" name="email" placeholder="name@example.com" required>
+                    </div>
+                </div>
+
+                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1" type="submit">
+                    Send Verification Code
                 </button>
+            </form>
+
+            <div class="mt-8 pt-8 border-t border-gray-50 text-center">
+                <p class="text-sm text-gray-400">Need help? Contact the <span class="text-blue-600 font-bold hover:underline cursor-pointer">NIT System Admin</span></p>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 {% endblock %}

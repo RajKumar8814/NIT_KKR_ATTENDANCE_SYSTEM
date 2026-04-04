@@ -1,43 +1,37 @@
-# Use official lightweight Python image compatible directly with specific ONNX bindings safely
-FROM python:3.11-slim
+# Use Python 3.10-slim: The standard for stable ML wheel bindings
+FROM python:3.10-slim
 
-# Set Python behavior rules
+# Prevent Python from writing .pyc files & buffering stdout/stderr
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PORT=8080
 
-# Install Linux system dependencies necessary for OpenCV
+# Install minimal Linux system dependencies for OpenCV and Face Analysis
+# We use libgl1-mesa-glx for the smallest footprint that supports libGL.so.1
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    libgl1 \
+    libgl1-mesa-glx \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
     libxrender-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Set backend working directory
+# Set working directory
 WORKDIR /app
 
-# Upgrade pip explicitly
-RUN pip install --no-cache-dir --upgrade pip
-
-# PRE-INSTALL PyTorch CPU exclusively to prevent Ultralytics from downloading the 2.5GB CUDA binaries
-# This ensures the Docker image strictly remains under the 4.0 GB Railway free tier limit natively.
-RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-
-# Copy requirements explicitly to cache dependency layers efficiently
+# Upgrade pip and install requirements
+# Using --no-cache-dir is critical to stay under 800MB
 COPY requirements.txt .
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Install dependencies cleanly mapping pre-compiled wheels internally smoothly
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy all application files (templates, static, routing, etc.)
+# Copy the rest of the application
 COPY . .
 
-# Expose Railway's dynamic port (defaults to 5000 if testing locally)
-ENV PORT=5000
-EXPOSE $PORT
+# Expose Railway's default port
+EXPOSE 8080
 
-# Run Gunicorn utilizing Async Uvicorn specifically hardcoding purely Single Core environments gracefully avoiding standard RAM deadlocks
-# Run Gunicorn with gthread workers specifically for better handling of CPU-bound ML tasks and ensuring threads don't block the master.
+# Run Gunicorn with gthread workers for CPU-bound ML stability on 1 CPU
+# This avoids 'sync' worker timeouts during face matching
 CMD ["sh", "-c", "gunicorn app:app --worker-class gthread --workers 1 --threads 4 --timeout 180 --bind 0.0.0.0:$PORT"]

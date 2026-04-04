@@ -1,52 +1,47 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mb-6 flex justify-between items-center">
-    <div>
-        <h1 class="text-2xl font-bold text-gray-800">Teacher Dashboard</h1>
-        <p class="text-gray-600">Welcome, {{ teacher.name }}</p>
+<div class="max-w-7xl mx-auto px-4 py-10">
+    <div class="mb-12 flex flex-col md:flex-row justify-between items-center bg-white p-10 rounded-3xl border border-gray-100 shadow-sm">
+        <div class="text-center md:text-left mb-6 md:mb-0">
+            <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">Faculty Dashboard</h1>
+            <p class="mt-2 text-lg text-gray-500 font-medium">NIT KKR Academic Portal for <span class="text-blue-600 font-bold">{{ teacher.name }}</span></p>
+        </div>
+        <div class="flex space-x-4">
+            <a href="{{ url_for('teacher.reports') }}" class="bg-white border-2 border-gray-100 text-gray-700 hover:border-blue-600 px-6 py-4 rounded-2xl font-bold transition-all">View Reports</a>
+            <a href="{{ url_for('teacher.setup_attendance') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-blue-200 transition-all">+ Take Attendance</a>
+        </div>
     </div>
-    <a href="{{ url_for('teacher.setup_attendance') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow">
-        Take Attendance (Face Scan)
-    </a>
-</div>
 
-<h2 class="text-xl font-semibold mb-4 text-gray-800">Your Assigned Subjects</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {% for ds in subjects %}
-    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-        <div class="bg-blue-600 px-4 py-3 text-white">
-            <h3 class="font-bold text-lg">{{ ds.name }}</h3>
-            <p class="text-blue-100 text-sm">{{ ds.class_name }}</p>
-        </div>
-        <div class="p-4">
-            <div class="flex justify-between items-center mb-4">
-                <span class="text-gray-600 font-medium text-sm">Total Lectures Recorded:</span>
-                <span class="text-2xl font-bold text-gray-800">{{ ds.total_lectures }}</span>
+    <h3 class="text-xl font-black text-gray-900 mb-8 uppercase tracking-widest border-b border-gray-100 pb-4">Assigned Subjects</h3>
+    
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {% if subjects %}
+            {% for sub in subjects %}
+            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 hover:shadow-xl hover:-translate-y-1 transition-all group">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="h-12 w-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 group-hover:bg-blue-100 transition-colors">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    </div>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-blue-400 bg-blue-50 px-2 py-1 rounded-md">ID: {{ sub.subject_id[:5] }}</span>
+                </div>
+                <h4 class="text-2xl font-black text-gray-900 mb-2">{{ sub.name }}</h4>
+                <p class="text-gray-500 font-bold mb-8 uppercase tracking-tighter text-xs">{{ sub.class_name }}</p>
+                <div class="pt-6 border-t border-gray-50 flex items-center justify-between">
+                    <div>
+                        <p class="text-2xl font-black text-blue-600">{{ sub.total_lectures }}</p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Total Lectures</p>
+                    </div>
+                    <a href="{{ url_for('teacher.setup_attendance') }}" class="h-10 w-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
             </div>
-            
-            <hr class="mb-4">
-            <div class="flex space-x-2">
-                <form method="POST" action="{{ url_for('teacher.update_lectures', class_id=ds.class_id, subject_id=ds.subject_id) }}" class="flex-1">
-                    <input type="hidden" name="action" value="add">
-                    <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white text-xs font-semibold py-2 px-2 rounded" title="Add an extra class lecture without attendance">
-                        + Extra Class
-                    </button>
-                </form>
-                <form method="POST" action="{{ url_for('teacher.update_lectures', class_id=ds.class_id, subject_id=ds.subject_id) }}" class="flex-1"
-                      onsubmit="return confirm('Reduce total lecture count by 1?');">
-                    <input type="hidden" name="action" value="cancel">
-                    <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-2 px-2 rounded" title="Reduce the total classes count">
-                        - Canceled Class
-                    </button>
-                </form>
+            {% endfor %}
+        {% else %}
+            <div class="col-span-full py-20 text-center bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+                <p class="text-gray-400 font-bold italic">No subjects assigned by system admin.</p>
             </div>
-        </div>
+        {% endif %}
     </div>
-    {% else %}
-    <div class="col-span-full bg-white p-8 text-center rounded-lg shadow border border-gray-100">
-        <p class="text-gray-500 text-lg">No subjects assigned yet.</p>
-        <p class="text-sm text-gray-400 mt-2">Contact Admin to assign classes.</p>
-    </div>
-    {% endfor %}
 </div>
 {% endblock %}

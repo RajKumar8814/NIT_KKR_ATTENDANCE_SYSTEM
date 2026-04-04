@@ -1,0 +1,103 @@
+/* Modern CSS Foundation for NIT KKR Smart Attendance */
+:root {
+    --primary-blue: #2563eb;
+    --secondary-indigo: #4338ca;
+    --accent-green: #059669;
+    --error-red: #dc2626;
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.2);
+}
+
+/* Base Body Styles */
+body {
+    background-color: #f8fafc;
+    color: #1e293b;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Scrollbar for 1GB RAM speed optimization hint */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Glassmorphism Classes */
+.glass-effect {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+}
+
+/* Animated Hover Transitions for Portal Buttons */
+.portal-card {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.portal-card:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+/* Modern Card Layouts */
+.modern-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    border: 1px solid #f1f5f9;
+}
+
+/* Custom Navigation Focus */
+.nav-link-active {
+    color: var(--primary-blue);
+    position: relative;
+}
+.nav-link-active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--primary-blue);
+    border-radius: 2px;
+}
+
+/* Interactive Utility Buttons */
+.btn-primary {
+    background: var(--primary-blue);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+.btn-primary:hover {
+    background: var(--secondary-indigo);
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+}
+
+/* Status Indicator Dots */
+.status-dot {
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+}
+.status-online { background-color: #10b981; }
+.status-offline { background-color: #6b7280; }
+
+/* Responsive Adjustments */
+@media (max-width: 640px) {
+    .modern-card {
+        border-radius: 16px;
+    }
+}

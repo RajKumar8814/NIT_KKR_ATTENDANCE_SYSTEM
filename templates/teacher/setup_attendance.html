@@ -1,68 +1,55 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white rounded-lg shadow border border-gray-100 p-8 mt-4">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">Smart Face Attendance</h1>
-    
-    <form method="POST" action="{{ url_for('teacher.setup_attendance') }}" enctype="multipart/form-data">
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Select Class & Subject</label>
-            <select name="subject_data" id="subject_select" required class="w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500">
-                <option value="" disabled selected>Select...</option>
-                {% for sub in teacher.subjects %}
-                <option value="{{ sub.class_id }}|{{ sub.subject_id }}">{{ sub.name }} (Class ID: {{ sub.class_id|truncate(6, True, '') }})</option>
-                {% endfor %}
-            </select>
-            <!-- Hidden inputs extracted via JS -->
-            <input type="hidden" name="class_id" id="hidden_class_id">
-            <input type="hidden" name="subject_id" id="hidden_subject_id">
+<div class="max-w-3xl mx-auto px-4 py-20">
+    <div class="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+        <div class="bg-blue-600 px-10 py-8">
+            <h1 class="text-3xl font-black text-white">Biometric Scan</h1>
+            <p class="text-blue-100 font-medium mt-1">Capture group photo to begin automated attendance</p>
         </div>
         
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-            <input type="date" name="date" id="date" required value="{{ current_date }}" class="w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500">
-        </div>
-        
-        <script>
-            document.getElementById('date').valueAsDate = new Date();
-            document.getElementById('subject_select').addEventListener('change', function() {
-                var vals = this.value.split('|');
-                document.getElementById('hidden_class_id').value = vals[0];
-                document.getElementById('hidden_subject_id').value = vals[1];
-            });
-        </script>
-        
-        <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Upload Group Class Photo</label>
-            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 flex flex-col items-center justify-center cursor-pointer transition" id="drop-area">
-                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-                <div class="mt-4 flex text-sm text-gray-600">
-                    <label for="group_photo" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
-                        <span>Upload a file</span>
-                        <input id="group_photo" name="group_photo" type="file" class="sr-only" accept="image/*" required>
-                    </label>
-                    <p class="pl-1">or drag and drop</p>
+        <form action="{{ url_for('teacher.setup_attendance') }}" method="POST" enctype="multipart/form-data" class="p-10 space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <label class="block text-sm font-black text-gray-700 mb-2 uppercase tracking-widest">Select Course</label>
+                    <select name="subject_id" class="w-full px-5 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all font-bold" required>
+                        <option value="">-- Choose Subject --</option>
+                        {% for sub in teacher.subjects %}
+                            <option value="{{ sub.subject_id }}">{{ sub.name }} ({{ sub.class_id[:5] }}...)</option>
+                        {% endfor %}
+                    </select>
+                    <!-- We pass class_id automatically via hidden field after selection or just use the sub data in backend -->
+                    {% for sub in teacher.subjects %}
+                        <input type="hidden" name="class_id" value="{{ sub.class_id }}">
+                    {% endfor %}
                 </div>
-                <p class="text-xs text-gray-500 mt-2">PNG, JPG, JPEG up to 16MB</p>
+                <div>
+                    <label class="block text-sm font-black text-gray-700 mb-2 uppercase tracking-widest">Session Date</label>
+                    <input type="date" name="date" class="w-full px-5 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all font-bold" value="{{ datetime_today }}">
+                </div>
             </div>
-            <p id="file-name-display" class="mt-2 text-sm text-blue-600 font-medium hidden"></p>
-        </div>
-        
-        <button type="submit" onclick="this.innerHTML='Processing Image... This may take a bit!'; this.classList.add('opacity-75', 'cursor-not-allowed');" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-blue-700 flex justify-center items-center transition">
-            Scan & Identify Faces
-        </button>
-    </form>
-</div>
 
-<script>
-    const fileInput = document.getElementById('group_photo');
-    const display = document.getElementById('file-name-display');
-    fileInput.addEventListener('change', function() {
-        if(this.files && this.files.length > 0) {
-            display.textContent = "Selected: " + this.files[0].name;
-            display.classList.remove('hidden');
-        }
-    });
-</script>
+            <div>
+                <label class="block text-sm font-black text-gray-700 mb-4 uppercase tracking-widest">Class Group Photo</label>
+                <div class="relative group cursor-pointer">
+                    <div class="w-full h-64 border-4 border-dashed border-gray-100 rounded-3xl flex flex-col items-center justify-center bg-gray-50 group-hover:bg-blue-50 group-hover:border-blue-100 transition-all">
+                        <svg class="h-16 w-16 text-gray-300 group-hover:text-blue-400 mb-4 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <p class="text-gray-400 font-bold text-sm">Click to upload or take a photo</p>
+                        <p class="text-xs text-gray-300 mt-1">High resolution recommended for AI accuracy</p>
+                    </div>
+                    <input type="file" name="group_photo" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" required>
+                </div>
+            </div>
+
+            <div class="pt-6">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-6 rounded-2xl shadow-xl shadow-blue-100 hover:shadow-blue-200 transition-all flex items-center justify-center">
+                    <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    Process AI Attendance
+                </button>
+            </div>
+            <div class="text-center">
+                <p class="text-[10px] text-gray-300 uppercase tracking-widest">Processing typically takes 10-15 seconds on single-core systems.</p>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

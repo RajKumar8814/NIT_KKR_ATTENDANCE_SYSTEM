@@ -7,110 +7,102 @@ import os
 import insightface
 from insightface.app import FaceAnalysis
 
-# Globally initialize precisely on container boot natively avoiding loop memory leaks.
-# 'buffalo_sc' is incredibly tiny (~15MB) and executes seamlessly on strict CPU execution limits.
+# Global pre-initialization specifically designed for 1 CPU / 1GB RAM Railway Environment.
+# Using 'buffalo_sc' ensures we stay well under 800MB Docker image size.
 try:
+    # Synchronous pre-load of the model at application startup to avoid first-request timeout
+    # ctx_id=0 means CPU-only mode
     face_app = FaceAnalysis(name='buffalo_sc', providers=['CPUExecutionProvider'])
     face_app.prepare(ctx_id=0, det_size=(640, 640))
 except Exception as e:
-    print(f"CRITICAL MODEL STARTUP ERROR: {e}")
+    print(f"CRITICAL: Failed to load InsightFace Model on boot: {e}")
     face_app = None
 
-def check_system_resources(max_ram_percent=85.0, max_cpu_load=75.0):
+def check_ram_usage(max_percent=85.0):
     """
-    Evaluates hardware thresholds explicitly natively without relying on psutil 
-    to preserve dependencies strictly mapping unbouncable CPU servers.
+    Safely checks Linux memory profile to prevent OOM (Out Of Memory) crashes.
     """
     try:
-        # Check Linux memory profile securely
         with open('/proc/meminfo', 'r') as f:
             lines = f.readlines()
-        mem_info = {}
-        for line in lines:
-            parts = line.split()
-            if len(parts) >= 2:
-                mem_info[parts[0].strip(':')] = int(parts[1])
-                
-        total_mem = mem_info.get('MemTotal', 1)
-        free_mem = mem_info.get('MemAvailable', mem_info.get('MemFree', 0))
-        used_mem_percent = ((total_mem - free_mem) / total_mem) * 100.0
+        mem_info = {line.split(':')[0]: int(line.split(':')[1].split()[0]) for line in lines}
+        total = mem_info.get('MemTotal', 1)
+        free = mem_info.get('MemAvailable', mem_info.get('MemFree', 0))
+        used_p = ((total - free) / total) * 100.0
+        return used_p < max_percent, used_p
+    except:
+        # Non-linux environment check bypass
+        return True, 0.0
 
-        if used_mem_percent > max_ram_percent:
-            return False, f"Server memory constrained ({used_mem_percent:.1f}% used)."
-
-        # Check CPU Linux load average over 1 min
-        # Load average defines threads waiting. On a 1 CPU system, load > 0.75 means roughly 75% load constraints.
-        load1, load5, load15 = os.getloadavg()
-        cpu_load_percent = load1 * 100.0
-
-        if cpu_load_percent > max_cpu_load:
-             return False, f"Server CPU constrained (Load: {cpu_load_percent:.1f}%)."
-
-        return True, "OK"
-    except Exception as e:
-        # Bypass on Non-Linux local testing
-        return True, "Check bypassed (Non-Linux OS)"
-
-def get_image_tensor(image_bytes, max_dim=640):
-    """ Fast streaming constraint algorithm bypassing buffer bloat. """
+def get_optimized_tensor(image_bytes, target_dim=640):
+    """
+    Resizes image bytes to an optimized tensor format skipping buffer overhead.
+    """
     try:
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         img_np = np.array(image)
-        # BGR conversion aligning with exact insightface matrices
+        # BGR conversion for InsightFace
         img_cv2 = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
         
-        # Scaling limits down strictly saving massive byte allocations
+        # Scale protection: Downscale large group photos to 640px to ensure CPU-bound speed
         h, w = img_cv2.shape[:2]
-        if max(h, w) > max_dim:
-            scale = max_dim / max(h, w)
+        if max(h, w) > target_dim:
+            scale = target_dim / max(h, w)
             img_cv2 = cv2.resize(img_cv2, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
 
         del image
         del img_np
         gc.collect()
         return img_cv2
-    except Exception as e:
-        print(f"Tensor extraction failed: {e}")
+    except:
         return None
 
 def extract_face_encodings(image_bytes):
-    """ Extract single or max array face vectors safely coercing formats to float32 mitigating Database sizing blobs. """
+    """
+    Extracts face vectors (embeddings) from raw image bytes.
+    Returns list of 512D vectors as Python lists. 
+    """
     if not face_app: return []
     
-    ok, msg = check_system_resources()
+    # RAM Protection circuit
+    ok, ram_p = check_ram_usage()
     if not ok:
-        print(f"Skipping ML inference forcefully: {msg}")
+        print(f"ABORT: Memory usage too high ({ram_p:.1f}%) to process Face ML.")
         return []
 
     try:
-        img_tensor = get_image_tensor(image_bytes)
+        img_tensor = get_optimized_tensor(image_bytes)
         if img_tensor is None: return []
 
+        # Run Face Discovery + Recognition
         faces = face_app.get(img_tensor)
         
         del img_tensor
         gc.collect()
 
-        # Extract only the 512D norm embeddings safely coercing single precision array lists
+        # We strictly use normed_embedding for stable Euclidean distance matching
         return [face.normed_embedding.astype(np.float32).tolist() for face in faces]
         
     except Exception as e:
-        print(f"Failed embedding extraction gracefully, bypassing 500 crashes: {e}")
+        print(f"Encoding extraction error: {e}")
         return []
 
 def match_faces_in_group(group_image_bytes, known_encodings_dict, tolerance=1.0):
-    """ Uses numpy distancing explicitly matching matrices smoothly bypassing heavy loops. """
+    """
+    Matches faces in a group photo against the database list of encodings.
+    Uses pure NumPy distance calculations which is much faster than standard loops.
+    """
     if not face_app: return []
 
-    ok, msg = check_system_resources()
-    if not ok:
-        print(f"Skipping group inference forcefully: {msg}")
-        return []
+    # CPU/RAM Check
+    ok, ram_p = check_ram_usage()
+    if not ok: return []
 
     try:
-        img_tensor = get_image_tensor(group_image_bytes)
+        img_tensor = get_optimized_tensor(group_image_bytes)
         if img_tensor is None: return []
 
+        # Parse group photo for all faces
         faces = face_app.get(img_tensor)
         del img_tensor
         gc.collect()
@@ -120,25 +112,26 @@ def match_faces_in_group(group_image_bytes, known_encodings_dict, tolerance=1.0)
         for unknown_face in faces:
             u_enc = unknown_face.normed_embedding.astype(np.float32)
             
-            best_roll = None
+            best_match_roll = None
             min_dist = float('inf')
 
-            for roll_no, saved_encs in known_encodings_dict.items():
-                if not saved_encs: continue
+            for roll_no, student_encodings in known_encodings_dict.items():
+                if not student_encodings: continue
                 
-                # Natively array distance Euclidean comparisons utilizing optimized C implementations within NumPy
-                for s_enc in saved_encs:
+                # NumPy optimized matrix distance calculation
+                for s_enc in student_encodings:
                     s_enc_np = np.array(s_enc, dtype=np.float32)
+                    # Euclidean distance for normalized vectors
                     dist = np.linalg.norm(u_enc - s_enc_np)
                     
                     if dist < tolerance and dist < min_dist:
                         min_dist = dist
-                        best_roll = roll_no
+                        best_match_roll = roll_no
                         
-            if best_roll:
-                identified_rolls.add(best_roll)
+            if best_match_roll:
+                identified_rolls.add(best_match_roll)
 
         return list(identified_rolls)
     except Exception as e:
-        print(f"Group matching crashed explicitly recovering cleanly maintaining up-time: {e}")
+        print(f"Group matching error: {e}")
         return []

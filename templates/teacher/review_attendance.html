@@ -1,65 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="max-w-4xl mx-auto">
-    <div class="bg-white rounded-lg shadow p-6 border border-gray-100 mb-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-2">Review Attendance</h1>
-        <p class="text-gray-600 mb-4">The AI has processed the classroom photo. Please review the results below and manually correct any errors (false positives/negatives) before saving.</p>
-        
-        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                    </svg>
+<div class="max-w-4xl mx-auto px-4 py-10">
+    <div class="mb-10 text-center">
+        <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">AI Review</h1>
+        <p class="mt-2 text-lg text-gray-500 font-medium">Verify the identified students for the session on {{ data.date }}</p>
+    </div>
+
+    <form action="{{ url_for('teacher.review_attendance') }}" method="POST" class="space-y-8">
+        <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+            <div class="bg-gray-50 p-6 flex flex-col md:flex-row justify-between items-center border-b border-gray-100">
+                <div class="flex items-center space-x-2 text-sm font-black uppercase tracking-widest text-gray-400">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>Total ID'd: {{ data.present_rolls|length }}</span>
                 </div>
-                <div class="ml-3">
-                    <p class="text-sm text-blue-700">
-                        Date: <span class="font-bold">{{ data.date }}</span>
-                    </p>
+                <div class="flex space-x-4 mt-4 md:mt-0">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-black shadow-lg transition-all">Submit Final Register</button>
+                    <a href="{{ url_for('teacher.dashboard') }}" class="px-6 py-3 text-gray-400 font-bold hover:text-gray-600">Discard</a>
                 </div>
+            </div>
+
+            <div class="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for student in students %}
+                <label class="relative flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all hover:bg-blue-50 
+                    {% if student.roll_no in data.present_rolls %} border-blue-600 bg-blue-50/50 {% else %} border-gray-100 bg-white {% endif %}">
+                    <input type="checkbox" name="present_rolls" value="{{ student.roll_no }}" 
+                           class="h-5 w-5 text-blue-600 border-gray-300 rounded-lg focus:ring-blue-600"
+                           {% if student.roll_no in data.present_rolls %} checked {% endif %}>
+                    <div class="ml-4">
+                        <p class="text-sm font-bold text-gray-900">{{ student.name }}</p>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ student.roll_no }}</p>
+                    </div>
+                </label>
+                {% endfor %}
             </div>
         </div>
-        
-        <form method="POST" action="{{ url_for('teacher.review_attendance') }}">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 border">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roll No</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        {% for s in students %}
-                        <tr class="hover:bg-gray-50 {% if s.roll_no in data.present_rolls %} bg-green-50 {% endif %}">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <label class="inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="present_rolls" value="{{ s.roll_no }}" class="form-checkbox h-5 w-5 text-green-600 rounded"
-                                    {% if s.roll_no in data.present_rolls %} checked {% endif %}>
-                                    <span class="ml-2 {% if s.roll_no in data.present_rolls %}text-green-700 font-semibold{% else %}text-gray-600{% endif %}">
-                                        {% if s.roll_no in data.present_rolls %} Present {% else %} Absent {% endif %}
-                                    </span>
-                                </label>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ s.roll_no }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ s.name }}</td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="3" class="px-6 py-4 text-center text-gray-500">No students found.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="mt-6 flex justify-end">
-                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow transition">
-                    Confirm & Save Attendance
-                </button>
-            </div>
-        </form>
-    </div>
+    </form>
 </div>
 {% endblock %}

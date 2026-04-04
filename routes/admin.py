@@ -6,6 +6,7 @@ from utils.face import extract_face_encodings
 import uuid
 import cloudinary.uploader
 import io
+import gc
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -34,7 +35,7 @@ def manage_teachers():
             flash("Teacher email already exists", "error")
         else:
             db.teachers.insert_one({"email": email, "name": name, "subjects": []})
-            flash("Teacher added successfully", "success")
+            flash("Teacher account created successfully", "success")
         return redirect(url_for("admin.manage_teachers"))
         
     teachers = list(db.teachers.find())
@@ -45,13 +46,12 @@ def manage_teachers():
 def manage_classes():
     db = get_db()
     if request.method == "POST":
-        class_name = request.form.get("class_name").strip() # e.g. CSE 2nd Year
-        
+        class_name = request.form.get("class_name").strip()
         if db.classes.find_one({"name": class_name}):
             flash("Class already exists", "error")
         else:
             db.classes.insert_one({"_id": str(uuid.uuid4()), "name": class_name, "subjects": []})
-            flash("Class added successfully", "success")
+            flash("Class added to system", "success")
         return redirect(url_for("admin.manage_classes"))
         
     classes = list(db.classes.find())
@@ -68,111 +68,30 @@ def add_subject(class_id):
     if not cls:
         return redirect(url_for("admin.manage_classes"))
 
-    existing_subj = None
-    for subj in cls.get("subjects", []):
-        if subj.get("name").lower() == subject_name.lower():
-            existing_subj = subj
-            break
+    existing_subj = next((s for s in cls.get("subjects", []) if s.get("name").lower() == subject_name.lower()), None)
 
     if existing_subj:
-        # UPSERT LOGIC
+        # Update existing subject's teacher
         subject_id = existing_subj.get("subject_id")
         old_teacher = existing_subj.get("teacher_email")
         
         if old_teacher and old_teacher != teacher_email:
-            db.teachers.update_one(
-                {"email": old_teacher},
-                {"$pull": {"subjects": {"class_id": class_id, "subject_id": subject_id}}}
-            )
+            db.teachers.update_one({"email": old_teacher}, {"$pull": {"subjects": {"class_id": class_id, "subject_id": subject_id}}})
             
         if teacher_email and old_teacher != teacher_email:
-            db.teachers.update_one(
-                {"email": teacher_email},
-                {"$push": {"subjects": {"class_id": class_id, "subject_id": subject_id, "name": existing_subj.get("name")}}}
-            )
+            db.teachers.update_one({"email": teacher_email}, {"$push": {"subjects": {"class_id": class_id, "subject_id": subject_id, "name": existing_subj.get("name")}}})
             
-        db.classes.update_one(
-            {"_id": class_id, "subjects.subject_id": subject_id},
-            {"$set": {"subjects.$.teacher_email": teacher_email}}
-        )
-        flash(f"Subject '{subject_name}' configuration updated.", "success")
-        
+        db.classes.update_one({"_id": class_id, "subjects.subject_id": subject_id}, {"$set": {"subjects.$.teacher_email": teacher_email}})
+        flash(f"Subject '{subject_name}' teacher mapping updated.", "success")
     else:
-        # INSERT LOGIC
+        # Create new subject
         subject_id = str(uuid.uuid4())
-        subject = {
-            "subject_id": subject_id,
-            "name": subject_name,
-            "teacher_email": teacher_email,
-            "total_lectures": 0
-        }
-        
+        subject = {"subject_id": subject_id, "name": subject_name, "teacher_email": teacher_email, "total_lectures": 0}
         db.classes.update_one({"_id": class_id}, {"$push": {"subjects": subject}})
-        
         if teacher_email:
-            db.teachers.update_one(
-                {"email": teacher_email}, 
-                {"$push": {"subjects": {"class_id": class_id, "subject_id": subject_id, "name": subject_name}}}
-            )
+            db.teachers.update_one({"email": teacher_email}, {"$push": {"subjects": {"class_id": class_id, "subject_id": subject_id, "name": subject_name}}})
+        flash("New subject linked to class", "success")
         
-        flash("Subject added successfully", "success")
-        
-    return redirect(url_for("admin.manage_classes"))
-
-@admin_bp.route("/classes/<class_id>/subjects/<subject_id>/remove_teacher", methods=["POST"])
-def remove_teacher_from_subject(class_id, subject_id):
-    db = get_db()
-    
-    # Find the class and the subject to know which teacher to remove it from
-    cls = db.classes.find_one({"_id": class_id})
-    if not cls: 
-        return redirect(url_for("admin.manage_classes"))
-    
-    target_teacher = None
-    for subj in cls.get("subjects", []):
-        if subj.get("subject_id") == subject_id:
-            target_teacher = subj.get("teacher_email")
-            break
-            
-    if target_teacher:
-        # Remove from teacher's array
-        db.teachers.update_one(
-            {"email": target_teacher},
-            {"$pull": {"subjects": {"class_id": class_id, "subject_id": subject_id}}}
-        )
-        
-    # Update the class subject to unassigned (empty string)
-    db.classes.update_one(
-        {"_id": class_id, "subjects.subject_id": subject_id},
-        {"$set": {"subjects.$.teacher_email": ""}}
-    )
-    
-    flash("Teacher unassigned successfully", "success")
-    return redirect(url_for("admin.manage_classes"))
-
-@admin_bp.route("/classes/<class_id>/subjects/<subject_id>/delete", methods=["POST"])
-def delete_subject_from_class(class_id, subject_id):
-    db = get_db()
-    
-    cls = db.classes.find_one({"_id": class_id})
-    if not cls: return redirect(url_for("admin.manage_classes"))
-        
-    for subj in cls.get("subjects", []):
-        if subj.get("subject_id") == subject_id:
-            teacher_email = subj.get("teacher_email")
-            if teacher_email:
-                db.teachers.update_one(
-                    {"email": teacher_email},
-                    {"$pull": {"subjects": {"subject_id": subject_id, "class_id": class_id}}}
-                )
-            break
-            
-    db.classes.update_one(
-        {"_id": class_id},
-        {"$pull": {"subjects": {"subject_id": subject_id}}}
-    )
-    
-    flash("Subject permanently removed from class schedule.", "success")
     return redirect(url_for("admin.manage_classes"))
 
 # --- Student Management ---
@@ -183,61 +102,42 @@ def manage_students():
         roll_no = request.form.get("roll_no").strip()
         name = request.form.get("name").strip()
         email = request.form.get("email").strip().lower()
-        branch = request.form.get("branch").strip()
-        year = request.form.get("year").strip()
         class_id = request.form.get("class_id").strip()
-        
-        photos = request.files.getlist("photos") # 1-5 photos
-        
+        photos = request.files.getlist("photos") # Limit to max 5
+
         if db.students.find_one({"roll_no": roll_no}):
-            flash("Student roll no already exists", "error")
+            flash("Roll number already registered.", "error")
             return redirect(url_for("admin.manage_students"))
             
         encodings = []
         image_urls = []
-        for file in photos[:5]: # Ensure absolute max 5 photos
+        
+        for file in photos[:5]:
             if file and file.filename != '':
                 image_bytes = file.read()
                 try:
+                    # ML Extraction (InsightFace SCRFD)
                     encs = extract_face_encodings(image_bytes)
                     if encs:
-                        # Append the first face found in the image safely
                         encodings.append(encs[0])
-                        
-                        # Upload successfully decoded images straight to Cloud resource skipping local disks completely
-                        try:
-                            upload_result = cloudinary.uploader.upload(
-                                io.BytesIO(image_bytes), 
-                                folder=f"attendance_sys/students/{roll_no}"
-                            )
-                            secure_url = upload_result.get("secure_url")
-                            if secure_url:
-                                image_urls.append(secure_url)
-                        except Exception as cloud_err:
-                            print(f"Transient Cloudinary mapping bypassed gracefully preventing application crashes: {cloud_err}")
+                        # Cloudinary Proof Storage
+                        upload_res = cloudinary.uploader.upload(io.BytesIO(image_bytes), folder=f"attendance/students/{roll_no}")
+                        image_urls.append(upload_res.get("secure_url"))
                 except Exception as e:
-                    print(f"Error extracting encoding safely isolated: {e}")
+                    print(f"Cloud Storage Error: {e}")
                 finally:
-                    # Explicit Memory Purge mitigating Docker deadlocks
                     del image_bytes
-                    import gc
                     gc.collect()
         
         if not encodings:
-            flash("Could not detect any faces in uploaded photos. Please try better images.", "error")
+            flash("Failed to capture any face embeddings. Use clearer photos.", "error")
             return redirect(url_for("admin.manage_students"))
             
         db.students.insert_one({
-            "roll_no": roll_no,
-            "name": name,
-            "email": email,
-            "branch": branch,
-            "year": year,
-            "class_id": class_id,
-            "encodings": encodings,
-            "image_urls": image_urls
+            "roll_no": roll_no, "name": name, "email": email,
+            "class_id": class_id, "encodings": encodings, "image_urls": image_urls
         })
-        flash(f"Student added successfully with {len(encodings)} encodings", "success")
+        flash(f"Student '{name}' added with {len(encodings)} biometric markers.", "success")
         return redirect(url_for("admin.manage_students"))
         
     students = list(db.students.find())
@@ -248,5 +148,5 @@ def manage_students():
 def delete_student(roll_no):
     db = get_db()
     db.students.delete_one({"roll_no": roll_no})
-    flash("Student deleted successfully", "success")
+    flash("Biometric data purged.", "success")
     return redirect(url_for("admin.manage_students"))
