@@ -20,6 +20,10 @@ WORKDIR /app
 # Upgrade pip explicitly
 RUN pip install --no-cache-dir --upgrade pip
 
+# PRE-INSTALL PyTorch CPU exclusively to prevent Ultralytics from downloading the 2.5GB CUDA binaries
+# This ensures the Docker image strictly remains under the 4.0 GB Railway free tier limit natively.
+RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
 # Copy requirements explicitly to cache dependency layers efficiently
 COPY requirements.txt .
 
