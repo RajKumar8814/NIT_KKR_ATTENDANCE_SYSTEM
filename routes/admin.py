@@ -94,6 +94,40 @@ def add_subject(class_id):
         
     return redirect(url_for("admin.manage_classes"))
 
+@admin_bp.route("/classes/delete/<class_id>", methods=["POST"])
+def delete_class(class_id):
+    db = get_db()
+    # Unbind subjects from teachers first
+    cls = db.classes.find_one({"_id": class_id})
+    if cls and "subjects" in cls:
+        for sub in cls["subjects"]:
+            if sub.get("teacher_email"):
+                db.teachers.update_one(
+                    {"email": sub["teacher_email"]},
+                    {"$pull": {"subjects": {"class_id": class_id, "subject_id": sub["subject_id"]}}}
+                )
+    db.classes.delete_one({"_id": class_id})
+    db.students.delete_many({"class_id": class_id}) # Remove students in that class
+    flash("Class and associated data removed.", "success")
+    return redirect(url_for("admin.manage_classes"))
+
+@admin_bp.route("/classes/<class_id>/subjects/delete/<subject_id>", methods=["POST"])
+def delete_subject(class_id, subject_id):
+    db = get_db()
+    cls = db.classes.find_one({"_id": class_id})
+    if not cls: return redirect(url_for("admin.manage_classes"))
+    
+    sub = next((s for s in cls.get("subjects", []) if s["subject_id"] == subject_id), None)
+    if sub and sub.get("teacher_email"):
+        db.teachers.update_one(
+            {"email": sub["teacher_email"]},
+            {"$pull": {"subjects": {"class_id": class_id, "subject_id": subject_id}}}
+        )
+    
+    db.classes.update_one({"_id": class_id}, {"$pull": {"subjects": {"subject_id": subject_id}}})
+    flash("Subject removed from class.", "success")
+    return redirect(url_for("admin.manage_classes"))
+
 @admin_bp.route("/teachers/delete/<email>", methods=["POST"])
 def delete_teacher(email):
     db = get_db()
