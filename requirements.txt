@@ -1,3 +1,4 @@
+numpy==1.26.4
 opencv-python-headless
 pillow
 ultralytics==8.0.196
@@ -10,6 +11,5 @@ uvicorn
 python-dotenv
 pymongo[srv]
 Flask-PyMongo
-numpy==1.26.4
 scipy
 dnspython
