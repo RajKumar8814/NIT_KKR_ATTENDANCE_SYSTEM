@@ -8,6 +8,7 @@ ENV PYTHONUNBUFFERED=1
 # Install Linux system dependencies necessary for OpenCV
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    libgl1 \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
@@ -38,4 +39,5 @@ ENV PORT=5000
 EXPOSE $PORT
 
 # Run Gunicorn utilizing Async Uvicorn specifically hardcoding purely Single Core environments gracefully avoiding standard RAM deadlocks
-CMD ["sh", "-c", "gunicorn app:app -k uvicorn.workers.UvicornWorker --workers 1 --timeout 180 --bind 0.0.0.0:$PORT"]
+# Run Gunicorn with gthread workers specifically for better handling of CPU-bound ML tasks and ensuring threads don't block the master.
+CMD ["sh", "-c", "gunicorn app:app --worker-class gthread --workers 1 --threads 4 --timeout 180 --bind 0.0.0.0:$PORT"]
