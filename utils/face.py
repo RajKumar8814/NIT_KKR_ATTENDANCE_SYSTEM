@@ -91,71 +91,80 @@ def extract_face_encodings(image_bytes):
         print(f"Encoding extraction error: {e}")
         return []
 
-def match_faces_in_group(group_image_bytes, known_encodings_dict, tolerance=1.0):
+def match_faces_in_group(group_image_bytes, known_encodings_dict, tolerance=0.9):
     """
     Matches faces in a group photo against the database list of encodings.
-    Now updated for Adaptive High-Density Scanning (1600px, 0.4 Thresh).
+    Vectorized for high-speed calculation to support classes with 60-70 students.
     Returns (list_of_rolls, error_message)
     """
     if not face_app: 
-        return [], "AI Engine not initialized correctly on boot."
+        return [], "AI Engine initialization pending. Please try again in 30 seconds."
 
-    # CPU/RAM Check
+    # RAM and CPU safety check
     ok, ram_p = check_ram_usage()
     if not ok: 
-        return [], f"Memory Limit (RAM: {ram_p:.1f}%) is too high to run AI scanning safely."
+        return [], f"Heavy System Load (RAM: {ram_p:.1f}%) detected. Try a smaller image or wait 1 minute."
 
     try:
-        # Increase scan resolution for back-row faces (target_dim=1600)
+        # High resolution (1600px) allows for detecting faces in the 4th/5th rows.
         img_tensor, err = get_optimized_tensor(group_image_bytes, target_dim=1600)
         if img_tensor is None: 
-            return [], f"Photo Decode Error: {err}"
+            return [], f"Decoding Failure: {err}"
 
-        # Lower det_thresh to 0.4 for improved scanning of back rows and occlusions
-        # Wrapped in extra try to catch specific AI core timeouts
+        # Run Face Discovery - The most CPU-intensive step
         try:
             faces = face_app.get(img_tensor)
         except Exception as ai_err:
-            return [], f"AI Detection Failed: {ai_err}. (Tip: Try a smaller photo)"
+            return [], f"Vision Engine Timeout: {ai_err}. Reduce photo size."
 
-        print(f"DEBUG: Scanned {len(faces)} faces at high density.")
+        print(f"DEBUG: InsightFace found {len(faces)} potential faces at high density.")
         
         del img_tensor
         gc.collect()
 
+        if not faces:
+            return [], "No students detected in the photo. Ensure lighting is clear."
+
+        # PERFORMANCE: Vectorize the identification stage
+        # Instead of nested loops, we pre-compile the entire class database into a matrix
+        known_matrix = [] # (Number of encodings, 128/512)
+        roll_map = []     # (Index back to Roll Number)
+
+        for roll_no, student_encodings in known_encodings_dict.items():
+            for s_enc in student_encodings:
+                if not s_enc: continue
+                s_np = np.array(s_enc, dtype=np.float32)
+                known_matrix.append(s_np)
+                roll_map.append(roll_no)
+
+        if not known_matrix:
+            return [], "No biometric records found for this class group."
+
+        known_matrix = np.array(known_matrix)   # High-speed NumPy matrix
+        roll_map = np.array(roll_map)
+        
         identified_rolls = set()
         
-        for unknown_face in faces:
-            u_enc = unknown_face.normed_embedding.astype(np.float32)
+        # Iterate detected faces and perform Matrix Euclidean Distance (extremely fast)
+        for d_face in faces:
+            u_enc = d_face.normed_embedding.astype(np.float32)
             
-            best_match_roll = None
-            min_dist = float('inf')
+            # Dimension safety (handles mix of buffalo_sc and others)
+            if u_enc.shape[0] != known_matrix.shape[1]:
+                continue
 
-            for roll_no, student_encodings in known_encodings_dict.items():
-                if not student_encodings: continue
-                
-                for s_enc in student_encodings:
-                    try:
-                        s_enc_np = np.array(s_enc, dtype=np.float32)
-                        
-                        # Shape Safety Check: buffalo_sc uses 128D, legacy models used 512D
-                        if u_enc.shape != s_enc_np.shape:
-                            continue
+            # Compute Euclidean distances to all known students at once!
+            # Math: sqrt(sum((u - k)^2))
+            diffs = known_matrix - u_enc
+            dists = np.linalg.norm(diffs, axis=1)
+            
+            # Find the index of the absolute best match
+            best_idx = np.argmin(dists)
+            if dists[best_idx] < tolerance:
+                identified_rolls.add(roll_map[best_idx])
 
-                        # Euclidean distance for normalized vectors
-                        dist = np.linalg.norm(u_enc - s_enc_np)
-                        
-                        if dist < tolerance and dist < min_dist:
-                            min_dist = dist
-                            best_match_roll = roll_no
-                    except:
-                        continue
-                        
-            if best_match_roll:
-                identified_rolls.add(best_match_roll)
-
-        print(f"DEBUG: Identified {len(identified_rolls)} students matches.")
+        print(f"DEBUG: Vectorized identification complete. Matched {len(identified_rolls)} students.")
         return list(identified_rolls), None
 
-    except Exception as general_err:
-        return [], f"System Overhead Warning: {general_err}"
+    except Exception as GeneralCrash:
+        return [], f"Inference Interrupt: {GeneralCrash} (Possible RAM Spike)"

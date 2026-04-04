@@ -45,23 +45,29 @@ def send_otp_email(user_email, otp):
         msg = MIMEMultipart()
         msg['From'] = mail_user
         msg['To'] = user_email
-        msg['Subject'] = "Attendance System Login OTP"
+        msg['Subject'] = "NIT KKR Attendance System OTP"
 
-        body = f"Your one-time password (OTP) is: {otp}\nIt is valid for 5 minutes."
+        # Premium Branded Email Body
+        body = f"Hello User,\n\nYour one-time password (OTP) for the NIT Kurukshetra Smart Attendance System is: {otp}\n\nThis code is valid for 5 minutes. If you did not request this, please ignore this email.\n\nInstitutional Biometric Portal"
         msg.attach(MIMEText(body, 'plain'))
 
         # Modern Gmail SMTP Port 465 with SSL (Extremely stable for Railway/Cloud)
-        # Port 465 is often left open when 587 is restricted
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=25)
+        # Note: Gmail REJECTS normal passwords. You MUST use a 16-character 'App Password'.
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=15)
         server.login(mail_user, mail_pass)
         server.send_message(msg)
         server.quit()
         return True, "Success"
+    except smtplib.SMTPAuthenticationError:
+        err_msg = "Gmail Authentication Failed: Use an 'App Password', not your normal password."
+        print(f"CRITICAL AUTH ERROR: {err_msg}")
+        print(f"========== [FALLBACK] OTP FOR {user_email}: {otp} ==========")
+        return False, err_msg
     except Exception as e:
-        print(f"FAILED TO SEND EMAIL: {e}")
-        # Always print for logs in case of failure
-        print(f"========== DEBUG OTP (Send Failure): {otp} for {user_email} ==========")
-        return False, str(e)
+        err_msg = f"Network/SMTP Error: {str(e)}"
+        print(f"FAILED TO SEND EMAIL: {err_msg}")
+        print(f"========== [FALLBACK] OTP FOR {user_email}: {otp} ==========")
+        return False, err_msg
 
 # Flask Middleware Decorators
 def login_required(f):
