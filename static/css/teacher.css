@@ -1,12 +1,12 @@
 /* Teacher Portal Specific Styles */
 :root {
-    --teacher-accent: #10B981;
-    --teacher-gradient: linear-gradient(135deg, #10B981, #065F46);
+    --teacher-accent: var(--pri-blue);
+    --teacher-gradient: linear-gradient(135deg, var(--pri-blue), var(--pri-blue-dark));
 }
 
 .btn-teacher {
     background: var(--teacher-gradient);
-    color: #064E3B;
+    color: white;
     font-weight: 800;
 }
 

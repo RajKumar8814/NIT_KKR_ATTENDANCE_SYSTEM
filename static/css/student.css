@@ -1,12 +1,12 @@
 /* Student Portal Specific Styles */
 :root {
-    --student-accent: #6EE7B7;
-    --student-gradient: linear-gradient(135deg, #6EE7B7, #064E3B);
+    --student-accent: var(--pri-blue);
+    --student-gradient: linear-gradient(135deg, var(--pri-blue), var(--pri-blue-deep));
 }
 
 .btn-student {
     background: var(--student-gradient);
-    color: #064E3B;
+    color: white;
     font-weight: 800;
 }
 

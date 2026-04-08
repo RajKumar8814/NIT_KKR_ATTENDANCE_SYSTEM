@@ -15,29 +15,27 @@
     {% endif %}
 </head>
 <body class="flex flex-col min-h-screen">
-    <div class="fixed inset-0 bg-[#062016]/80 backdrop-blur-xl z-[-1]"></div>
-    
-    {% if request.endpoint != 'index' and request.endpoint != 'auth.login' %}
+{% if request.endpoint != 'index' and request.endpoint != 'auth.login' %}
     <nav>
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <a href="{{ url_for('index') }}" class="logo-text uppercase">Smart Attendance</a>
             
             <div class="flex items-center gap-6">
                 {% if session.get('user') %}
-                    <div class="hidden md:flex items-center gap-4 py-2 px-4 rounded-2xl bg-slate-100/50 border border-slate-200/50">
+                    <div class="hidden md:flex items-center gap-4 py-2 px-4 rounded-2xl bg-slate-50 border border-slate-100">
                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ session.get('role') }} Portal</span>
-                        <span class="text-sm font-bold text-slate-800">{{ session.get('user') }}</span>
+                        <span class="text-sm font-bold text-slate-900">{{ session.get('user') }}</span>
                     </div>
                     
                     <div class="flex gap-2">
                         {% if session.get('role') == 'admin' %}
-                            <a href="{{ url_for('admin.dashboard') }}" class="text-xs font-black uppercase tracking-widest text-slate-800 hover:text-slate-500 transition-colors">Dashboard</a>
+                            <a href="{{ url_for('admin.dashboard') }}" class="text-xs font-black uppercase tracking-widest text-slate-900 hover:text-blue-600 transition-colors">Dashboard</a>
                         {% elif session.get('role') == 'teacher' %}
-                            <a href="{{ url_for('teacher.dashboard') }}" class="text-xs font-black uppercase tracking-widest text-slate-800 hover:text-slate-500 transition-colors">Dashboard</a>
+                            <a href="{{ url_for('teacher.dashboard') }}" class="text-xs font-black uppercase tracking-widest text-slate-900 hover:text-blue-600 transition-colors">Dashboard</a>
                         {% elif session.get('role') == 'student' %}
-                            <a href="{{ url_for('student.dashboard') }}" class="text-xs font-black uppercase tracking-widest text-slate-800 hover:text-slate-500 transition-colors">Dashboard</a>
+                            <a href="{{ url_for('student.dashboard') }}" class="text-xs font-black uppercase tracking-widest text-slate-900 hover:text-blue-600 transition-colors">Dashboard</a>
                         {% endif %}
-                        <a href="{{ url_for('auth.logout') }}" class="text-xs font-black uppercase tracking-widest text-rose-500 hover:text-rose-600 ml-4">Logout</a>
+                        <a href="{{ url_for('auth.logout') }}" class="text-xs font-black uppercase tracking-widest text-rose-500 hover:text-rose-600 ml-4 transition-colors">Logout</a>
                     </div>
                 {% else %}
                     <a href="{{ url_for('auth.login') }}" class="btn-premium">Sign In →</a>

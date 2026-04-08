@@ -1,7 +1,7 @@
 /* Admin Portal Specific Styles */
 :root {
-    --admin-accent: #065F46;
-    --admin-gradient: linear-gradient(135deg, #064E3B, #10B981);
+    --admin-accent: var(--pri-blue);
+    --admin-gradient: linear-gradient(135deg, var(--pri-blue-deep), var(--pri-blue));
 }
 
 .btn-admin {
