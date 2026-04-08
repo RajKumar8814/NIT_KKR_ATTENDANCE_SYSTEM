@@ -1,0 +1,18 @@
+/* Student Portal Specific Styles */
+:root {
+    --student-accent: #6d28d9; /* Violet */
+    --student-gradient: linear-gradient(135deg, #6d28d9, #5b21b6);
+}
+
+.btn-student {
+    background: var(--student-gradient);
+    color: white;
+}
+
+.student-card {
+    border-left: 4px solid var(--student-accent);
+}
+
+.progress-bar-fill {
+    transition: width 1s ease-in-out;
+}

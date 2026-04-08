@@ -200,6 +200,11 @@ def manage_students():
         
     students = list(db.students.find())
     classes = list(db.classes.find())
+    # Map class IDs to names for cleaner UI display
+    class_map = {str(c['_id']): c['name'] for c in classes}
+    for stu in students:
+        stu['class_name'] = class_map.get(str(stu.get('class_id', '')), "Unassigned")
+
     return render_template("admin/students.html", students=students, classes=classes)
 
 @admin_bp.route("/students/delete/<roll_no>", methods=["POST"])

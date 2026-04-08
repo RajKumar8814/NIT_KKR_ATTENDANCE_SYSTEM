@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="max-w-2xl mx-auto py-32 animate-fade">
-    <div class="premium-card p-12 border-pink-100 shadow-2xl">
-        <h1 class="text-4xl font-black mb-2 text-slate-800 tracking-tighter">Initialize Session</h1>
-        <p class="text-slate-500 font-extrabold uppercase tracking-widest text-[10px] mb-12">Select your academic module and upload a high-density group photo for AI analysis.</p>
+    <div class="premium-card p-12 border-teal-100 shadow-2xl">
+        <h1 class="text-4xl font-black mb-2 text-slate-800 tracking-tighter">Mark Attendance</h1>
+        <p class="text-slate-500 font-extrabold uppercase tracking-widest text-[10px] mb-12">Choose your course and upload class photo</p>
         
         <form action="{{ url_for('teacher.setup_attendance') }}" method="POST" enctype="multipart/form-data" class="space-y-12">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                     <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 ml-1">Academic Module</label>
                     <div class="relative">
-                        <select name="subject_id" class="w-full h-16 bg-slate-50 border border-slate-200 rounded-2xl px-6 text-slate-800 text-lg focus:outline-none focus:ring-4 focus:ring-pink-500/10 appearance-none font-bold cursor-pointer" required>
+                        <select name="subject_id" class="w-full h-16 bg-slate-50 border border-slate-200 rounded-2xl px-6 text-slate-800 text-lg focus:outline-none focus:ring-4 focus:ring-teal-500/10 appearance-none font-bold cursor-pointer" required>
                             <option value="" disabled selected>-- Select Course --</option>
                             {% for sub in teacher.subjects %}
                                 <option value="{{ sub.subject_id }}">{{ sub.name }}</option>
@@ -22,8 +22,8 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 ml-1">Session Date</label>
-                    <input type="date" name="date" class="w-full h-16 bg-slate-50 border border-slate-200 rounded-2xl px-6 text-slate-800 text-lg focus:outline-none focus:ring-4 focus:ring-pink-500/10 font-bold" value="{{ datetime_today }}">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 ml-1">Class Date</label>
+                    <input type="date" name="date" class="w-full h-16 bg-slate-50 border border-slate-200 rounded-2xl px-6 text-slate-800 text-lg focus:outline-none focus:ring-4 focus:ring-teal-500/10 font-bold" value="{{ datetime_today }}">
                 </div>
             </div>
 
@@ -32,23 +32,46 @@
             {% endfor %}
 
             <div>
-                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 ml-1">Adaptive AI Biometric Scan (1600px)</label>
-                <div class="relative group cursor-pointer border-2 border-dashed border-slate-200 rounded-[32px] p-16 bg-slate-50/50 hover:bg-white hover:border-pink-500/30 transition-all text-center">
-                    <div class="space-y-4">
-                        <div class="h-20 w-20 bg-pink-500/10 rounded-3xl flex items-center justify-center mx-auto text-pink-500 group-hover:scale-110 transition-transform">
+                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 ml-1">Classroom Photo</label>
+                <div class="relative group cursor-pointer border-2 border-dashed border-slate-200 rounded-[32px] p-12 bg-slate-50/50 hover:bg-white hover:border-teal-500/30 transition-all text-center">
+                    <div class="space-y-4" id="upload-feedback">
+                        <div class="h-20 w-20 bg-teal-500/10 rounded-3xl flex items-center justify-center mx-auto text-teal-500 group-hover:scale-110 transition-transform">
                             <svg class="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         </div>
-                        <p class="text-sm font-black text-slate-400 uppercase tracking-widest">Select Institutional Group Photo</p>
-                        <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest italic">Optimized for back-row detection</p>
+                        <p class="text-sm font-black text-slate-400 uppercase tracking-widest">Select Classroom Photo</p>
                     </div>
-                    <input type="file" name="group_photo" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" required>
+                    <img id="photo-preview" src="#" alt="Preview" class="hidden w-full h-64 object-cover rounded-2xl mb-4" />
+                    <input type="file" name="group_photo" id="photo-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" required onchange="handlePhotoUpload(this)">
                 </div>
             </div>
 
-            <button class="btn-premium w-full h-20 text-[10px] font-black uppercase tracking-[0.4em] shadow-pink-100" type="submit">
-                Run Institutional AI Scan →
+            <button class="btn-premium w-full h-20 text-[10px] font-black uppercase tracking-[0.4em] bg-teal-600 shadow-teal-100" type="submit">
+                Mark Attendance
             </button>
         </form>
     </div>
 </div>
+
+<script>
+function handlePhotoUpload(input) {
+    const feedback = document.getElementById('upload-feedback');
+    const preview = document.getElementById('photo-preview');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+            feedback.innerHTML = `
+                <p class="text-teal-600 font-black text-xs uppercase tracking-widest">
+                    ✓ Classroom Photo Captured Successfully
+                </p>
+            `;
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
 {% endblock %}

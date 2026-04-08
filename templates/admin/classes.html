@@ -3,10 +3,10 @@
 <div class="py-12 animate-fade">
     <div class="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
         <div>
-            <h1 class="text-6xl font-black tracking-tighter text-slate-800 mb-2">Academic Roadmap</h1>
+            <h1 class="text-6xl font-black tracking-tighter text-slate-800 mb-2">Academic Section</h1>
             <p class="text-slate-500 font-extrabold uppercase tracking-widest text-[10px]">Manage institution course groups, subject mappings, and faculty goals.</p>
         </div>
-        <button onclick="document.getElementById('class-modal').classList.toggle('hidden')" class="btn-premium px-10 h-16 flex items-center justify-center uppercase tracking-widest text-[10px] font-black">Initialize New Course +</button>
+        <button onclick="document.getElementById('class-modal').classList.remove('hidden')" class="btn-premium px-10 h-16 flex items-center justify-center uppercase tracking-widest text-[10px] font-black">Add New Class +</button>
     </div>
 
     <!-- Classes Grid -->
@@ -24,7 +24,7 @@
 
             <div class="p-10 border-b border-slate-50 bg-slate-50/50">
                 <h3 class="text-3xl font-black text-slate-800 mb-2">{{ cls.name }}</h3>
-                <code class="text-[10px] font-black text-pink-500 bg-pink-50 px-2 py-1 rounded-lg uppercase tracking-widest border border-pink-100/50">ID: {{ (cls._id|string)[:8] }}...</code>
+                <code class="text-[10px] font-black text-slate-400 bg-white px-3 py-1.5 rounded-lg border border-slate-200 uppercase tracking-widest">ID: {{ cls._id|string }}</code>
             </div>
             
             <div class="p-10 flex-grow">
@@ -34,13 +34,13 @@
                         {% for sub in cls.subjects %}
                         <div class="flex items-center justify-between group/sub">
                             <div class="flex-grow">
-                                <p class="text-lg font-black text-slate-800 leading-tight group-hover/sub:text-pink-500 transition-colors">{{ sub.name }}</p>
+                                <p class="text-lg font-black text-slate-800 leading-tight group-hover/sub:text-slate-500 transition-colors">{{ sub.name }}</p>
                                 <p class="text-[10px] font-black text-slate-400 mt-1 uppercase tracking-widest">
                                     {% if sub.teacher_email %}{{ sub.teacher_email }}{% else %}<span class="text-rose-500 italic">Faculty Missing</span>{% endif %}
                                 </p>
                             </div>
                             <div class="flex items-center gap-6">
-                                <p class="text-2xl font-black text-pink-500">{{ sub.total_lectures }}<span class="text-[10px] text-slate-300 ml-1">/ 34</span></p>
+                                <p class="text-2xl font-black text-slate-800">{{ sub.total_lectures }}<span class="text-[10px] text-slate-300 ml-1">/ 34</span></p>
                                 
                                 <form action="{{ url_for('admin.delete_subject', class_id=cls._id, subject_id=sub.subject_id) }}" method="POST" 
                                       onsubmit="return confirm('Remove institutional subject mapping?')" class="opacity-0 group-hover/sub:opacity-100 transition-opacity">
@@ -57,11 +57,11 @@
                 </div>
             </div>
 
-            <div class="p-10 pt-0 bg-slate-50/20">
+            <div class="p-10 pt-0">
                 <form action="{{ url_for('admin.add_subject', class_id=cls._id) }}" method="POST" class="space-y-4">
-                    <input type="text" name="subject_name" placeholder="Subject Handle (e.g. CS-901)" class="w-full h-12 bg-white border border-slate-200 rounded-xl px-4 text-slate-800 text-sm focus:outline-none focus:ring-4 focus:ring-pink-500/10 transition-all placeholder:text-slate-300" required>
+                    <input type="text" name="subject_name" placeholder="Subject Name" class="w-full h-12 bg-slate-50 border border-slate-200 rounded-xl px-4 text-slate-800 text-sm focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all placeholder:text-slate-300" required>
                     <div class="relative">
-                        <select name="teacher_email" class="w-full h-12 bg-white border border-slate-200 rounded-xl px-4 text-slate-800 text-sm focus:outline-none focus:ring-4 focus:ring-pink-500/10 appearance-none cursor-pointer">
+                        <select name="teacher_email" class="w-full h-12 bg-slate-50 border border-slate-200 rounded-xl px-4 text-slate-800 text-sm focus:outline-none focus:ring-4 focus:ring-slate-100 appearance-none cursor-pointer">
                             <option value="">-- Assign Faculty Link --</option>
                             <option value="">Unassigned</option>
                             {% for teacher in teachers %}
@@ -72,28 +72,38 @@
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
                         </div>
                     </div>
-                    <button type="submit" class="w-full btn-premium h-12 text-[10px] font-black uppercase tracking-widest">Seal Subject Mapping</button>
+                    <button type="submit" class="w-full btn-premium h-12 text-[10px] font-black uppercase tracking-widest shadow-xl">Seal Subject Mapping</button>
                 </form>
             </div>
         </div>
         {% endfor %}
     </div>
 
-    <!-- Modal for Class Creation -->
-    <div id="class-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-3xl z-[2000] flex items-center justify-center p-6">
-        <div class="premium-card w-full max-w-md animate-fade border-pink-100 shadow-2xl">
-            <h2 class="text-4xl font-black mb-2 text-slate-800 tracking-tighter">Academic Initialization</h2>
-            <p class="text-slate-400 font-extrabold mb-12 text-[10px] uppercase tracking-widest">Define new course boundaries for semester tracking.</p>
-            <form action="{{ url_for('admin.manage_classes') }}" method="POST" class="space-y-8">
-                <div>
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 ml-1">Official Class Name</label>
-                    <input type="text" name="class_name" placeholder="e.g. B.Tech IT-B" class="w-full h-16 bg-slate-50 border border-slate-200 rounded-2xl px-6 text-slate-800 text-lg focus:outline-none focus:ring-4 focus:ring-pink-500/10 transition-all placeholder:text-slate-300" required>
+    <!-- Modal for Class Creation (Full Screen Upgrade) -->
+    <div id="class-modal" class="hidden fixed inset-0 z-[9999]">
+        <div class="fs-modal bg-white">
+            <div class="max-w-4xl mx-auto w-full">
+                <div class="flex justify-between items-start mb-20">
+                    <div>
+                        <h2 class="text-6xl font-black text-slate-800 tracking-tighter mb-4">Add New Class</h2>
+                        <p class="text-slate-400 font-black text-[12px] uppercase tracking-[0.4em]">Create a new course section for academic tracking</p>
+                    </div>
+                    <button onclick="document.getElementById('class-modal').classList.add('hidden')" class="text-slate-300 hover:text-rose-500 transition-colors">
+                        <svg class="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
                 </div>
-                <div class="flex gap-4 pt-8 border-t border-slate-100 mt-4">
-                    <button type="button" onclick="document.getElementById('class-modal').classList.add('hidden')" class="flex-1 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] hover:text-rose-500 transition-colors">Discard</button>
-                    <button type="submit" class="btn-premium flex-1 h-16 shadow-pink-100 text-[10px] font-black uppercase tracking-widest">Create Academic Map</button>
-                </div>
-            </form>
+
+                <form action="{{ url_for('admin.manage_classes') }}" method="POST" class="space-y-12">
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-6 ml-1">Official Class Name</label>
+                        <input type="text" name="class_name" placeholder="e.g. B.Tech IT-B" class="w-full h-24 bg-slate-50 border border-slate-200 rounded-[32px] px-10 text-slate-800 text-3xl font-black focus:outline-none focus:ring-8 focus:ring-slate-100 transition-all placeholder:text-slate-200" required>
+                    </div>
+                    <div class="flex gap-8 pt-12">
+                        <button type="button" onclick="document.getElementById('class-modal').classList.add('hidden')" class="px-12 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] hover:text-rose-500 transition-colors">Discard</button>
+                        <button type="submit" class="btn-premium flex-1 h-20 text-[10px] font-black uppercase tracking-widest shadow-2xl">Create Academic Section</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

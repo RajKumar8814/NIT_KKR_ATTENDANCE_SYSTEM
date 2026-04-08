@@ -1,40 +1,46 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="py-24 animate-fade">
-    <div class="text-center mb-24 max-w-4xl mx-auto">
-        <h1 class="text-[5rem] md:text-8xl font-black text-slate-800 tracking-tighter mb-4 leading-[0.95]">Precision <br> Attendance</h1>
-        <p class="text-xs font-black text-pink-500 uppercase tracking-[1em] font-heading opacity-80">NIT Kurukshetra | Biometric Ecosystem</p>
+<div class="py-32 animate-fade">
+    <div class="text-center mb-32 max-w-5xl mx-auto">
+        <p class="text-[12px] font-black text-slate-400 uppercase tracking-[1.2em] mb-8">National Institute of Technology, Kurukshetra</p>
+        <h1 class="text-[6rem] md:text-9xl font-black text-slate-800 tracking-tighter leading-[0.85] mb-4">Smart <br> Attendance</h1>
     </div>
 
-    <!-- Light Entrance Portals -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-7xl mx-auto px-6">
+    <!-- Clean Entrance Portals -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto px-6">
         <!-- Admin Access -->
-        <a href="{{ url_for('auth.login', role='admin') }}" class="premium-card group border-pink-50 hover:bg-pink-500/5 transition-all shadow-xl hover:shadow-2xl">
-            <div class="text-5xl mb-8">🛡️</div>
-            <h2 class="text-3xl font-black text-slate-800 mb-4 group-hover:text-pink-500 transition-colors">Admin Console</h2>
-            <p class="text-slate-500 font-medium mb-12 h-24 text-sm leading-relaxed">Centralized oversight for NIT biometrics, enrollment management, and department logs.</p>
-            <div class="btn-premium w-full text-center py-5 uppercase tracking-[0.5em] font-black text-[10px]">Access Administrator Hub →</div>
+        <a href="{{ url_for('auth.login', role='admin') }}" class="premium-card flex flex-col justify-between overflow-hidden group border-none hover:shadow-2xl transition-all h-[400px]">
+            <div class="p-12">
+                <h2 class="text-4xl font-black text-slate-800 tracking-tighter group-hover:text-slate-600 transition-colors">Admin Portal</h2>
+            </div>
+            <div class="p-8">
+                <div class="btn-premium w-full py-6 uppercase tracking-[0.4em] font-black text-[10px] bg-gradient-to-r from-slate-800 to-slate-700 shadow-xl">Launch Administrator Hub</div>
+            </div>
         </a>
 
         <!-- Teacher Access -->
-        <a href="{{ url_for('auth.login', role='teacher') }}" class="premium-card group border-orange-50 hover:bg-orange-500/5 transition-all shadow-xl hover:shadow-2xl">
-            <div class="text-5xl mb-8">🎓</div>
-            <h2 class="text-3xl font-black text-slate-800 mb-4 group-hover:text-orange-500 transition-colors">Faculty Portal</h2>
-            <p class="text-slate-500 font-medium mb-12 h-24 text-sm leading-relaxed">High-performance AI face-marking for institutional lecture sessions (Adaptive 1600px Scanning).</p>
-            <div class="btn-premium w-full text-center py-5 uppercase tracking-[0.5em] font-black text-[10px] bg-gradient-to-br from-orange-400 to-red-500 shadow-orange-100">Access Faculty Portal →</div>
+        <a href="{{ url_for('auth.login', role='teacher') }}" class="premium-card flex flex-col justify-between overflow-hidden group border-none hover:shadow-2xl transition-all h-[400px]">
+            <div class="p-12">
+                <h2 class="text-4xl font-black text-slate-800 tracking-tighter group-hover:text-teal-600 transition-colors">Faculty Portal</h2>
+            </div>
+            <div class="p-8">
+                <div class="btn-premium w-full py-6 uppercase tracking-[0.4em] font-black text-[10px] bg-gradient-to-r from-teal-500 to-emerald-600 shadow-xl shadow-teal-100">Enter Educator Portal</div>
+            </div>
         </a>
 
         <!-- Student Access -->
-        <a href="{{ url_for('auth.login', role='student') }}" class="premium-card group border-emerald-50 hover:bg-emerald-500/5 transition-all shadow-xl hover:shadow-2xl">
-            <div class="text-5xl mb-8">📖</div>
-            <h2 class="text-3xl font-black text-slate-800 mb-4 group-hover:text-emerald-500 transition-colors">Student Log</h2>
-            <p class="text-slate-500 font-medium mb-12 h-24 text-sm leading-relaxed">Personal verification records and real-time attendance compliance monitoring (75% Goal Check).</p>
-            <div class="btn-premium w-full text-center py-5 uppercase tracking-[0.5em] font-black text-[10px] bg-gradient-to-br from-emerald-400 to-teal-500 shadow-emerald-100">Access Student Hub →</div>
+        <a href="{{ url_for('auth.login', role='student') }}" class="premium-card flex flex-col justify-between overflow-hidden group border-none hover:shadow-2xl transition-all h-[400px]">
+            <div class="p-12">
+                <h2 class="text-4xl font-black text-slate-800 tracking-tighter group-hover:text-violet-600 transition-colors">Student Portal</h2>
+            </div>
+            <div class="p-8">
+                <div class="btn-premium w-full py-6 uppercase tracking-[0.4em] font-black text-[10px] bg-gradient-to-r from-violet-500 to-indigo-600 shadow-xl shadow-violet-100">View Personal Log</div>
+            </div>
         </a>
     </div>
 
     <div class="mt-48 text-center">
-        <p class="text-[10px] font-black text-slate-300 uppercase tracking-[1.5em] animate-pulse">Select Your Portal To Begin System Verification</p>
+        <p class="text-[10px] font-black text-slate-300 uppercase tracking-[1.5em] animate-pulse">Select Your Official Portal to Authenticate</p>
     </div>
 </div>
 {% endblock %}
