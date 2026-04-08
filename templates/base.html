@@ -17,32 +17,37 @@
 <body class="flex flex-col min-h-screen">
     <div class="glass-overlay"></div>
     
-    {% if request.endpoint != 'index' and request.endpoint != 'auth.login' %}
-    <nav>
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <a href="{{ url_for('index') }}" class="logo-text uppercase">Smart Attendance</a>
-            
-            <div class="flex items-center gap-6">
-                {% if session.get('user') %}
-                    <div class="hidden md:flex items-center gap-4 py-2 px-4 rounded-2xl bg-slate-100/50 border border-slate-200/50">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ session.get('role') }} Portal</span>
-                        <span class="text-sm font-bold text-slate-800">{{ session.get('user') }}</span>
-                    </div>
-                    
-                    <div class="flex gap-2">
-                        {% if session.get('role') == 'admin' %}
-                            <a href="{{ url_for('admin.dashboard') }}" class="text-xs font-black uppercase tracking-widest text-slate-800 hover:text-slate-500 transition-colors">Dashboard</a>
-                        {% elif session.get('role') == 'teacher' %}
-                            <a href="{{ url_for('teacher.dashboard') }}" class="text-xs font-black uppercase tracking-widest text-slate-800 hover:text-slate-500 transition-colors">Dashboard</a>
-                        {% elif session.get('role') == 'student' %}
-                            <a href="{{ url_for('student.dashboard') }}" class="text-xs font-black uppercase tracking-widest text-slate-800 hover:text-slate-500 transition-colors">Dashboard</a>
-                        {% endif %}
-                        <a href="{{ url_for('auth.logout') }}" class="text-xs font-black uppercase tracking-widest text-rose-500 hover:text-rose-600 ml-4">Logout</a>
-                    </div>
-                {% else %}
-                    <a href="{{ url_for('auth.login') }}" class="btn-premium">Sign In →</a>
-                {% endif %}
+    {% if request.endpoint == 'index' %}
+    <header>
+        <div class="institutional-logo">NIT KKR SMART ATTENDANCE</div>
+        <div class="ai-badge">
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-8 text-teal-400">
+                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                </div>
+                <div>
+                    <div class="ai-badge-title uppercase">Visionary AI <br> Insights</div>
+                    <div class="ai-badge-sub">AI-Powered Facial Tracking Analytics</div>
+                </div>
             </div>
+        </div>
+    </header>
+    {% elif request.endpoint != 'auth.login' %}
+    <nav class="h-24 px-[5%] flex items-center justify-between border-b border-slate-100 bg-white/80 backdrop-blur-xl sticky top-0 z-[1000]">
+        <a href="{{ url_for('index') }}" class="institutional-logo">NIT KKR SMART ATTENDANCE</a>
+        
+        <div class="flex items-center gap-8">
+            {% if session.get('user') %}
+                <div class="hidden lg:flex items-center gap-4 py-2.5 px-6 rounded-full bg-slate-50 border border-slate-100">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ session.get('role') }} Portal</span>
+                    <span class="text-sm font-bold text-slate-800">{{ session.get('user') }}</span>
+                </div>
+                <div class="flex gap-4">
+                    <a href="{{ url_for('auth.logout') }}" class="text-xs font-black uppercase tracking-widest text-rose-500 hover:text-rose-600 transition-colors">Logout</a>
+                </div>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-launch btn-admin text-[10px] px-8 py-3 w-auto">Portal Secure Login</a>
+            {% endif %}
         </div>
     </nav>
     {% endif %}
