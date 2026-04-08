@@ -1,43 +1,46 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="hero-section animate-fade">
-    <h1 class="hero-main">Biometric Presence <br> Integration</h1>
-    <p class="hero-sub text-center mx-auto">AI-Powered Insights for the NIT Kurukshetra Ecosystem | Seamless Facial Validation</p>
+<div class="py-32 animate-fade">
+    <div class="text-center mb-32 max-w-5xl mx-auto">
+        <p class="text-[12px] font-black text-slate-400 uppercase tracking-[1.2em] mb-8">National Institute of Technology, Kurukshetra</p>
+        <h1 class="text-[6rem] md:text-9xl font-black text-slate-800 tracking-tighter leading-[0.85] mb-4">Smart <br> Attendance</h1>
+    </div>
 
-    <!-- High-Fidelity Portal Grid -->
-    <div class="portal-grid">
-        <!-- Admin Portal -->
-        <div class="premium-card">
-            <div class="h-14 w-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 mb-8 border border-rose-100">
-                <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+    <!-- Clean Entrance Portals -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto px-6">
+        <!-- Admin Access -->
+        <a href="{{ url_for('auth.login', role='admin') }}" class="premium-card flex flex-col justify-between overflow-hidden group border-none hover:shadow-2xl transition-all h-[400px]">
+            <div class="p-12">
+                <h2 class="text-4xl font-black text-slate-800 tracking-tighter group-hover:text-slate-600 transition-colors">Admin Portal</h2>
             </div>
-            <h2 class="card-title">Institutional <br> Control Center</h2>
-            <p class="card-desc">Centralized operational control for NIT biometrics, enrollment management, and department logs.</p>
-            <h3 class="card-label">Admin Console</h3>
-            <a href="{{ url_for('auth.login', role='admin') }}" class="btn-launch btn-gradient-admin">Launch Administrator Hub</a>
-        </div>
+            <div class="p-8">
+                <div class="btn-premium w-full py-6 uppercase tracking-[0.4em] font-black text-[10px] bg-gradient-to-r from-slate-800 to-slate-700 shadow-xl">Launch Administrator Hub</div>
+            </div>
+        </a>
 
-        <!-- Faculty Portal -->
-        <div class="premium-card">
-            <div class="h-14 w-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 mb-8 border border-emerald-100">
-                <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+        <!-- Teacher Access -->
+        <a href="{{ url_for('auth.login', role='teacher') }}" class="premium-card flex flex-col justify-between overflow-hidden group border-none hover:shadow-2xl transition-all h-[400px]">
+            <div class="p-12">
+                <h2 class="text-4xl font-black text-slate-800 tracking-tighter group-hover:text-teal-600 transition-colors">Faculty Portal</h2>
             </div>
-            <h2 class="card-title">One-Tap Class <br> Validation</h2>
-            <p class="card-desc">Optimized AI face-marking for institutional lecture sessions (Adaptive High-Fidelity Scanning).</p>
-            <h3 class="card-label">Faculty Portal</h3>
-            <a href="{{ url_for('auth.login', role='teacher') }}" class="btn-launch btn-gradient-faculty">Enter Educator Portal</a>
-        </div>
+            <div class="p-8">
+                <div class="btn-premium w-full py-6 uppercase tracking-[0.4em] font-black text-[10px] bg-gradient-to-r from-teal-500 to-emerald-600 shadow-xl shadow-teal-100">Enter Educator Portal</div>
+            </div>
+        </a>
 
-        <!-- Student Portal -->
-        <div class="premium-card">
-            <div class="h-14 w-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 mb-8 border border-amber-100">
-                <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        <!-- Student Access -->
+        <a href="{{ url_for('auth.login', role='student') }}" class="premium-card flex flex-col justify-between overflow-hidden group border-none hover:shadow-2xl transition-all h-[400px]">
+            <div class="p-12">
+                <h2 class="text-4xl font-black text-slate-800 tracking-tighter group-hover:text-violet-600 transition-colors">Student Portal</h2>
             </div>
-            <h2 class="card-title">Real-time <br> Presence Tracker</h2>
-            <p class="card-desc">Personal verification records and real-time attendance compliance monitoring (75% Goal Check).</p>
-            <h3 class="card-label">Student Log</h3>
-            <a href="{{ url_for('auth.login', role='student') }}" class="btn-launch btn-gradient-student">View Personal Log</a>
-        </div>
+            <div class="p-8">
+                <div class="btn-premium w-full py-6 uppercase tracking-[0.4em] font-black text-[10px] bg-gradient-to-r from-violet-500 to-indigo-600 shadow-xl shadow-violet-100">View Personal Log</div>
+            </div>
+        </a>
+    </div>
+
+    <div class="mt-48 text-center">
+        <p class="text-[10px] font-black text-slate-300 uppercase tracking-[1.5em] animate-pulse">Select Your Official Portal to Authenticate</p>
     </div>
 </div>
 {% endblock %}
