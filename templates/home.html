@@ -9,19 +9,21 @@
     <!-- Clean Entrance Portals -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto px-6">
         <!-- Admin Access -->
-        <a href="{{ url_for('auth.login', role='admin') }}" class="premium-card flex flex-col justify-between overflow-hidden group border-none hover:border-blue-500/50 transition-all h-[400px]">
+        <a href="{{ url_for('auth.login', role='admin') }}" class="premium-card flex flex-col justify-between overflow-hidden group border-none hover:border-blue-500/50 transition-all h-[400px] bg-white">
             <div class="p-12">
-                <h2 class="text-4xl font-black text-slate-800 tracking-tighter group-hover:text-blue-600 transition-colors">Admin Portal</h2>
+                <h2 class="text-4xl font-black text-slate-800 tracking-tighter group-hover:text-blue-600 transition-colors mb-4">Admin Portal</h2>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest leading-relaxed">Centralized management of faculty, students, and institutional course structures.</p>
             </div>
             <div class="p-8">
-                <div class="btn-premium w-full py-6 uppercase tracking-[0.4em] font-black text-[10px] bg-gradient-to-r from-slate-900 to-slate-800 shadow-xl">Launch Administrator Hub</div>
+                <div class="btn-premium w-full py-6 uppercase tracking-[0.4em] font-black text-[10px] bg-gradient-to-r from-blue-600 to-blue-700 shadow-xl shadow-blue-900/10">Launch Administrator Hub</div>
             </div>
         </a>
 
         <!-- Teacher Access -->
-        <a href="{{ url_for('auth.login', role='teacher') }}" class="premium-card flex flex-col justify-between overflow-hidden group border-none hover:border-blue-500/50 transition-all h-[400px]">
+        <a href="{{ url_for('auth.login', role='teacher') }}" class="premium-card flex flex-col justify-between overflow-hidden group border-none hover:border-blue-500/50 transition-all h-[400px] bg-white">
             <div class="p-12">
-                <h2 class="text-4xl font-black text-slate-800 tracking-tighter group-hover:text-blue-600 transition-colors">Faculty Portal</h2>
+                <h2 class="text-4xl font-black text-slate-800 tracking-tighter group-hover:text-blue-600 transition-colors mb-4">Faculty Portal</h2>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest leading-relaxed">Biometric attendance capture, automated reporting, and course schedule management.</p>
             </div>
             <div class="p-8">
                 <div class="btn-premium w-full py-6 uppercase tracking-[0.4em] font-black text-[10px] bg-gradient-to-r from-blue-600 to-blue-700 shadow-xl shadow-blue-900/10">Enter Educator Portal</div>
@@ -29,12 +31,13 @@
         </a>
 
         <!-- Student Access -->
-        <a href="{{ url_for('auth.login', role='student') }}" class="premium-card flex flex-col justify-between overflow-hidden group border-none hover:border-blue-500/50 transition-all h-[400px]">
+        <a href="{{ url_for('auth.login', role='student') }}" class="premium-card flex flex-col justify-between overflow-hidden group border-none hover:border-blue-500/50 transition-all h-[400px] bg-white">
             <div class="p-12">
-                <h2 class="text-4xl font-black text-slate-800 tracking-tighter group-hover:text-blue-600 transition-colors">Student Portal</h2>
+                <h2 class="text-4xl font-black text-slate-800 tracking-tighter group-hover:text-blue-600 transition-colors mb-4">Student Portal</h2>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest leading-relaxed">Personal attendance tracking, academic history, and institutional eligibility monitoring.</p>
             </div>
             <div class="p-8">
-                <div class="btn-premium w-full py-6 uppercase tracking-[0.4em] font-black text-[10px] bg-gradient-to-r from-blue-500 to-blue-600 shadow-xl shadow-blue-900/10">View Personal Log</div>
+                <div class="btn-premium w-full py-6 uppercase tracking-[0.4em] font-black text-[10px] bg-gradient-to-r from-blue-600 to-blue-700 shadow-xl shadow-blue-900/10">View Personal Log</div>
             </div>
         </a>
     </div>
