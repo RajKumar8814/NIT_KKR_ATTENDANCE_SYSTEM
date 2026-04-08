@@ -3,43 +3,43 @@
 <div class="py-12 animate-fade">
     <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
         <div>
-            <h1 class="text-6xl font-black tracking-tighter text-slate-800 mb-2">Faculty Portal</h1>
-            <p class="text-slate-500 font-extrabold uppercase tracking-widest text-[10px]">Professor <span class="text-teal-600 font-black">{{ teacher.name }}</span> | Portal Access</p>
+            <h1 class="text-6xl font-black tracking-tighter text-white mb-2">Faculty Portal</h1>
+            <p class="text-emerald-400 font-extrabold uppercase tracking-widest text-[10px]">Professor <span class="text-emerald-200 font-black">{{ teacher.name }}</span> | Portal Access</p>
         </div>
         <div class="flex gap-4">
-            <a href="{{ url_for('teacher.reports') }}" class="btn-premium bg-slate-100/50 border border-slate-200 text-slate-700 hover:bg-slate-200/50 px-8 h-14 flex items-center justify-center uppercase tracking-widest text-[10px]">Attendance History</a>
-            <a href="{{ url_for('teacher.setup_attendance') }}" class="btn-premium px-8 h-14 flex items-center justify-center uppercase tracking-widest text-[10px] bg-teal-600 shadow-teal-100">Mark Attendance</a>
+            <a href="{{ url_for('teacher.reports') }}" class="btn-premium bg-surface border border-border-forest text-emerald-100 hover:bg-surface-light px-8 h-14 flex items-center justify-center uppercase tracking-widest text-[10px]">Attendance History</a>
+            <a href="{{ url_for('teacher.setup_attendance') }}" class="btn-premium px-8 h-14 flex items-center justify-center uppercase tracking-widest text-[10px] bg-emerald-600">Mark Attendance</a>
         </div>
     </div>
 
     <!-- Active Subjects -->
-    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 border-b border-slate-100 pb-2">Course</h3>
+    <h3 class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-8 border-b border-border-forest pb-2">Institutional Course Access</h3>
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
         {% if subjects %}
             {% for sub in subjects %}
-            <div class="premium-card p-10 flex flex-col justify-between group border-teal-50 hover:border-teal-200">
+            <div class="premium-card p-10 flex flex-col justify-between group hover:border-emerald-500/50">
                 <div class="flex items-start justify-between mb-8">
                     <div>
-                        <h4 class="text-3xl font-black text-slate-800 mb-2 leading-tight group-hover:text-teal-600 transition-colors">{{ sub.name }}</h4>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ sub.class_name }}</p>
+                        <h4 class="text-3xl font-black text-white mb-2 leading-tight group-hover:text-emerald-400 transition-colors">{{ sub.name }}</h4>
+                        <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">{{ sub.class_name }}</p>
                     </div>
                 </div>
 
-                <div class="pt-8 border-t border-slate-50 flex items-center justify-between">
+                <div class="pt-8 border-t border-border-forest flex items-center justify-between">
                     <div class="text-left">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Classes</p>
-                        <p class="text-4xl font-black text-slate-800">{{ sub.total_lectures }}<span class="text-xs text-slate-300 ml-1">/ 34</span></p>
+                        <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">Total Classes</p>
+                        <p class="text-4xl font-black text-white">{{ sub.total_lectures }}<span class="text-xs text-emerald-400/50 ml-1">/ 34</span></p>
                     </div>
-                    <a href="{{ url_for('teacher.setup_attendance') }}" class="h-14 w-14 bg-teal-500/10 rounded-2xl flex items-center justify-center text-teal-600 hover:bg-teal-600 hover:text-white transition-all transform hover:rotate-12">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    <a href="{{ url_for('teacher.setup_attendance') }}" class="h-14 w-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500 hover:bg-emerald-600 hover:text-emerald-900 transition-all transform hover:rotate-12">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     </a>
                 </div>
             </div>
             {% endfor %}
         {% else %}
-            <div class="col-span-full py-32 text-center premium-card border-dashed border-slate-200">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse">Waiting for Academic Registrar Mappings...</p>
+            <div class="col-span-full py-32 text-center premium-card border-dashed border-border-forest">
+                <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest animate-pulse">Waiting for Academic Registrar Mappings...</p>
             </div>
         {% endif %}
     </div>

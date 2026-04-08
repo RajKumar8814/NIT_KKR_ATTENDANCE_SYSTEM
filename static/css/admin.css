@@ -1,7 +1,7 @@
 /* Admin Portal Specific Styles */
 :root {
-    --admin-accent: #0f172a;
-    --admin-gradient: linear-gradient(135deg, #0f172a, #1e293b);
+    --admin-accent: #065F46;
+    --admin-gradient: linear-gradient(135deg, #064E3B, #10B981);
 }
 
 .btn-admin {
@@ -14,5 +14,5 @@
 }
 
 .metric-card-admin {
-    background: linear-gradient(135deg, #ffffff, #f8fafc);
+    background: var(--surface);
 }

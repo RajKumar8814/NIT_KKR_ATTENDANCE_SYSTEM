@@ -3,17 +3,17 @@
 <div class="py-12 animate-fade">
     <div class="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
         <div>
-            <h1 class="text-6xl font-black tracking-tighter text-slate-800 mb-2">Student Registry</h1>
-            <p class="text-slate-500 font-extrabold uppercase tracking-widest text-[10px]">Official Enrollment & Facial Biometric Directory</p>
+            <h1 class="text-6xl font-black tracking-tighter text-white mb-2">Student Registry</h1>
+            <p class="text-emerald-500 font-extrabold uppercase tracking-widest text-[10px]">Official Enrollment & Facial Biometric Directory</p>
         </div>
-        <button onclick="document.getElementById('student-modal').classList.remove('hidden')" class="btn-premium px-10 h-16 flex items-center justify-center uppercase tracking-widest text-[10px] font-black shadow-pink-100">Add New Student +</button>
+        <button onclick="document.getElementById('student-modal').classList.remove('hidden')" class="btn-premium px-10 h-16 flex items-center justify-center uppercase tracking-widest text-[10px] font-black">Add New Student +</button>
     </div>
 
     <!-- Student Table -->
     <div class="premium-card p-0 overflow-hidden overflow-x-auto border-pink-50 shadow-2xl">
         <table class="premium-table">
             <thead>
-                <tr class="bg-slate-50/50">
+                <tr class="bg-surface-light/30">
                     <th class="w-1/4">Full Name</th>
                     <th class="w-1/6">Roll Number</th>
                     <th class="w-1/6">Class</th>
@@ -23,7 +23,7 @@
             </thead>
             <tbody>
                 {% for student in students %}
-                <tr class="hover:bg-slate-50/50 transition-colors border-b border-slate-50 last:border-0">
+                <tr class="hover:bg-emerald-900/10 transition-colors border-b border-border-forest last:border-0">
                     <td>
                         <div class="flex items-center gap-4">
                             <div class="h-10 w-10 rounded-xl bg-slate-800 text-white flex items-center justify-center font-black uppercase">{{ student.name[0] }}</div>
@@ -34,14 +34,14 @@
                     <td><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ student.class_name }}</p></td>
                     <td class="text-center">
                         {% if student.encodings %}
-                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 uppercase tracking-widest border border-emerald-100">Verified</span>
+                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black bg-emerald-900/40 text-emerald-400 uppercase tracking-widest border border-emerald-500/20">Verified</span>
                         {% else %}
-                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black bg-rose-50 text-rose-500 uppercase tracking-widest border border-rose-100">Pending</span>
+                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black bg-rose-900/40 text-rose-400 uppercase tracking-widest border border-rose-500/20">Pending</span>
                         {% endif %}
                     </td>
                     <td class="text-right p-4">
                         <form action="{{ url_for('admin.delete_student', roll_no=student.roll_no) }}" method="POST" onsubmit="return confirm('WARNING: Are you sure you want to permanently remove this student record?')">
-                            <button type="submit" class="text-rose-500 hover:text-rose-700 font-extrabold uppercase tracking-widest text-[9px] transition-colors bg-rose-50 px-4 py-2 rounded-xl">Remove Record</button>
+                            <button type="submit" class="text-rose-400 hover:text-rose-300 font-extrabold uppercase tracking-widest text-[9px] transition-colors bg-rose-900/40 px-4 py-2 rounded-xl">Remove Record</button>
                         </form>
                     </td>
                 </tr>
@@ -56,10 +56,10 @@
             <div class="max-w-4xl mx-auto w-full">
                 <div class="flex justify-between items-start mb-20">
                     <div>
-                        <h2 class="text-6xl font-black text-slate-800 tracking-tighter mb-4">Add Student</h2>
-                        <p class="text-slate-400 font-black text-[12px] uppercase tracking-[0.4em]">Official Biometric Enrollment Pipeline</p>
+                        <h2 class="text-6xl font-black text-white tracking-tighter mb-4">Add Student</h2>
+                        <p class="text-emerald-500 font-black text-[12px] uppercase tracking-[0.4em]">Official Biometric Enrollment Pipeline</p>
                     </div>
-                    <button onclick="document.getElementById('student-modal').classList.add('hidden')" class="text-slate-300 hover:text-rose-500 transition-colors">
+                    <button onclick="document.getElementById('student-modal').classList.add('hidden')" class="text-emerald-800 hover:text-rose-500 transition-colors">
                         <svg class="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>

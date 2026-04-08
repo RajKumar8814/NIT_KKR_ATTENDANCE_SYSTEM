@@ -15,7 +15,7 @@
     {% endif %}
 </head>
 <body class="flex flex-col min-h-screen">
-    <div class="glass-overlay"></div>
+    <div class="fixed inset-0 bg-[#062016]/80 backdrop-blur-xl z-[-1]"></div>
     
     {% if request.endpoint != 'index' and request.endpoint != 'auth.login' %}
     <nav>

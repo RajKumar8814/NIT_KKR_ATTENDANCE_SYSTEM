@@ -1,12 +1,13 @@
 /* Teacher Portal Specific Styles */
 :root {
-    --teacher-accent: #0d9488; /* Teal */
-    --teacher-gradient: linear-gradient(135deg, #0d9488, #0f766e);
+    --teacher-accent: #10B981;
+    --teacher-gradient: linear-gradient(135deg, #10B981, #065F46);
 }
 
 .btn-teacher {
     background: var(--teacher-gradient);
-    color: white;
+    color: #064E3B;
+    font-weight: 800;
 }
 
 .teacher-card {
