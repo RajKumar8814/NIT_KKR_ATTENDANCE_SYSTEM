@@ -13,7 +13,7 @@
                         <select name="subject_id" class="w-full h-16 bg-blue-50 border border-blue-100 rounded-2xl px-6 text-slate-900 text-lg focus:outline-none focus:ring-4 focus:ring-blue-500/5 appearance-none font-bold cursor-pointer" required>
                             <option value="" disabled selected>-- Select Course --</option>
                             {% for sub in teacher.subjects %}
-                                <option value="{{ sub.subject_id }}">{{ sub.name }}</option>
+                                <option value="{{ sub.class_id }}|{{ sub.subject_id }}">{{ sub.name }}</option>
                             {% endfor %}
                         </select>
                         <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-blue-300">
@@ -26,10 +26,6 @@
                     <input type="date" name="date" class="w-full h-16 bg-blue-50 border border-blue-100 rounded-2xl px-6 text-slate-900 text-lg focus:outline-none focus:ring-4 focus:ring-blue-500/5 font-bold" value="{{ datetime_today }}">
                 </div>
             </div>
-
-            {% for sub in teacher.subjects %}
-                <input type="hidden" name="class_id" value="{{ sub.class_id }}">
-            {% endfor %}
 
             <div>
                 <label class="block text-[10px] font-black uppercase tracking-widest text-blue-600 mb-4 ml-1">Classroom Photo</label>

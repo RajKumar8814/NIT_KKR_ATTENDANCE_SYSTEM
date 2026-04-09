@@ -40,8 +40,12 @@ def setup_attendance():
     teacher = db.teachers.find_one({"email": email})
     
     if request.method == "POST":
-        class_id = request.form.get("class_id")
-        subject_id = request.form.get("subject_id")
+        combined_id = request.form.get("subject_id", "")
+        if "|" not in combined_id:
+            flash("Session error: Invalid course selection.", "error")
+            return redirect(request.url)
+            
+        class_id, subject_id = combined_id.split("|")
         date_str = request.form.get("date", datetime.date.today().isoformat())
         group_photo = request.files.get("group_photo")
         
